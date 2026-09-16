@@ -3,7 +3,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- android:icon intentionally omitted -- it falls back to the platform
+    <!-- android:icon intentionally omitted: it falls back to the platform
          default. Add a real @mipmap/ic_launcher (adaptive icon) before
          shipping; see README.md. -->
     <application

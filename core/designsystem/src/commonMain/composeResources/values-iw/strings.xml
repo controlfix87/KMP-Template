@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Hebrew strings live under values-iw, not values-he: Android's legacy ISO
+      code for Hebrew is "iw" (java.util.Locale); values-he silently fails to
+      match on a real, non-trivial slice of Android devices.
+    -->
+    <string name="app_name">KMPTemplate</string>
+
+    <string name="example_title">דוגמה</string>
+    <string name="example_loading">טוען…</string>
+    <string name="example_retry">נסה שוב</string>
+    <string name="example_error_no_internet">אין חיבור לאינטרנט</string>
+    <string name="example_error_generic">משהו השתבש</string>
+</resources>

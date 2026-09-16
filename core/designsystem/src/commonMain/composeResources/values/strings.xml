@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KMPTemplate</string>
+
+    <string name="example_title">Example</string>
+    <string name="example_loading">Loading…</string>
+    <string name="example_retry">Retry</string>
+    <string name="example_error_no_internet">No internet connection</string>
+    <string name="example_error_generic">Something went wrong</string>
+</resources>

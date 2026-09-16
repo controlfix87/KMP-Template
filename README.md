@@ -79,6 +79,37 @@ nothing. Use:
 `./scripts/check_common_main_purity.sh` catches an `android.*`/`java.time`
 import leaking into `commonMain`/`commonTest` before you even run Gradle.
 
+## Three real bugs this template's own build caught (keep an eye out for these)
+
+Verified by actually building this template end to end, not just written from
+memory — worth knowing before you hit the same class of error and burn time
+on it:
+
+1. **A literal `--` inside an XML `<!-- -->` comment breaks the build**, both
+   in a manifest (`ManifestMerger2$MergeFailureException`) and in Compose
+   Multiplatform's string-resource converter (a generic, line-number-free
+   `XML file ... is not valid. Check the file content.` — it swallows the
+   real parser exception). This is standard XML — comments may never contain
+   `--` except as the closing delimiter — but AGP's and CMP's error messages
+   for it are bad enough to cost real debugging time. Write `omitted: it`, not
+   `omitted -- it`, in an XML comment.
+2. **Kotlin block comments nest.** Writing a literal `/*` inside a `/** ... */`
+   KDoc comment (e.g. describing a glob like `di/*Module.kt`) opens a *nested*
+   comment that the doc's own closing `*/` then closes instead of the outer
+   one — silently swallowing every line of real code after it into the
+   comment, which surfaces as a confusing "Unresolved reference" error in a
+   completely different file that used to compile fine. Don't put `/*` inside
+   a KDoc comment's prose, even to describe a file glob.
+3. **`implementation`, not `api`, on a dependency whose type is part of your
+   own public API silently breaks downstream consumers**, not the module
+   that got it wrong. `core/network`'s `createHttpClient()` returns Ktor's
+   `HttpClient`; declaring `implementation(libs.ktor.client.core)` there
+   compiled `core:network` itself just fine, then failed `:androidApp` with
+   `Cannot access class 'io.ktor.client.HttpClient'` for a dependency
+   `androidApp` never touches directly. If a public function's signature
+   exposes a type, that dependency needs `api(...)`, not
+   `implementation(...)`.
+
 ## Host notes (aarch64 Linux SBC)
 
 If you're on the same kind of machine this was bootstrapped on:

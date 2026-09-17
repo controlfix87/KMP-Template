@@ -2,6 +2,7 @@ package com.kmptemplate.app.di
 
 import com.kmptemplate.core.network.createHttpClient
 import org.koin.dsl.module
+import org.koin.dsl.onClose
 
 /**
  * Everything below is a `single` shared across the whole app. Feature modules
@@ -10,5 +11,5 @@ import org.koin.dsl.module
  * inside a feature.
  */
 fun coreNetworkModule(baseUrl: String, enableLogging: Boolean) = module {
-    single { createHttpClient(baseUrl = baseUrl, enableLogging = enableLogging) }
+    single { createHttpClient(baseUrl = baseUrl, enableLogging = enableLogging) } onClose { it?.close() }
 }

@@ -32,3 +32,4 @@ include(":feature:example")
 
 // ---- app ------------------------------------------------------------------
 include(":androidApp")
+include(":sharedApp")

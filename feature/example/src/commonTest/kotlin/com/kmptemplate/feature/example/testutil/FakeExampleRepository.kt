@@ -25,12 +25,14 @@ class FakeExampleRepository(
     var refreshResult: EmptyResult<DataError.Remote> = AppResult.Success(Unit)
     var refreshItems: List<ExampleItem> = initialItems
 
+    var refreshGate: kotlinx.coroutines.CompletableDeferred<Unit>? = null
     val calls = mutableListOf<String>()
 
     override fun observeItems() = itemsFlow.asStateFlow()
 
     override suspend fun refresh(): EmptyResult<DataError.Remote> {
         calls += "refresh()"
+        refreshGate?.await()
         val result = refreshResult
         if (result is AppResult.Success) {
             itemsFlow.value = refreshItems

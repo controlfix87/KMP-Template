@@ -9,6 +9,9 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import kotlinx.serialization.SerializationException
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.io.IOException
@@ -36,9 +39,23 @@ class ExampleRepositoryImpl(
         val dtos: List<ExampleItemDto> = httpClient.get("example/items").body()
         items.value = dtos.map { it.toDomain() }
         AppResult.Success(Unit)
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: HttpRequestTimeoutException) {
+        AppResult.Failure(DataError.Remote.REQUEST_TIMEOUT)
     } catch (e: IOException) {
         AppResult.Failure(DataError.Remote.NO_INTERNET)
     } catch (e: ResponseException) {
-        AppResult.Failure(DataError.Remote.SERVER_ERROR)
+        AppResult.Failure(when (e.response.status.value) {
+            401, 403 -> DataError.Remote.UNAUTHORIZED
+            404 -> DataError.Remote.NOT_FOUND
+            408 -> DataError.Remote.REQUEST_TIMEOUT
+            in 500..599 -> DataError.Remote.SERVER_ERROR
+            else -> DataError.Remote.UNKNOWN
+        })
+    } catch (e: SerializationException) {
+        AppResult.Failure(DataError.Remote.SERIALIZATION)
+    } catch (e: io.ktor.serialization.ContentConvertException) {
+        AppResult.Failure(DataError.Remote.SERIALIZATION)
     }
 }

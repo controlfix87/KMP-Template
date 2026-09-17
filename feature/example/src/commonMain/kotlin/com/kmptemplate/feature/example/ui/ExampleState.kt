@@ -14,4 +14,5 @@ data class ExampleState(
     val items: List<ExampleItem> = emptyList(),
     val isLoading: Boolean = true,
     val error: DataError.Remote? = null,
+    val query: String = "",
 )

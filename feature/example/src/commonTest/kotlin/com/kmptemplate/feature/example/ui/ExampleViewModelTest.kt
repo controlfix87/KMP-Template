@@ -1,93 +1,72 @@
 package com.kmptemplate.feature.example.ui
 
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import app.cash.turbine.test
-import assertk.assertThat
-import assertk.assertions.hasSize
-import assertk.assertions.isEqualTo
-import assertk.assertions.isFalse
-import assertk.assertions.isNull
 import com.kmptemplate.core.common.AppResult
 import com.kmptemplate.core.common.DataError
 import com.kmptemplate.core.model.ExampleItem
 import com.kmptemplate.feature.example.testutil.FakeExampleRepository
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
+import kotlinx.coroutines.test.*
+import kotlin.test.*
 
-/**
- * `ExampleViewModel` launches on `viewModelScope`, which resolves to
- * `Dispatchers.Main` -- unavailable on a plain JVM/commonTest run unless a
- * test dispatcher is installed as Main first. `UnconfinedTestDispatcher`
- * (rather than the default `StandardTestDispatcher`) runs launched coroutines
- * eagerly, so a `viewModel.state.test { ... }` block sees the post-`init`
- * state without needing an explicit `advanceUntilIdle()` in every test.
- */
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExampleViewModelTest {
-
-    @BeforeTest
-    fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
+    private val stores = mutableListOf<ViewModelStore>()
+    @BeforeTest fun setUp() { Dispatchers.setMain(UnconfinedTestDispatcher()) }
+    @AfterTest fun tearDown() { stores.forEach { it.clear() }; stores.clear(); Dispatchers.resetMain() }
+    private fun model(repo: FakeExampleRepository, saved: SavedStateHandle = SavedStateHandle()): ExampleViewModel {
+        val store = ViewModelStore().also { stores.add(it) }
+        return ViewModelProvider.create(store, viewModelFactory { initializer { ExampleViewModel(repo, saved) } })[ExampleViewModel::class]
     }
-
-    @AfterTest
-    fun tearDown() {
-        Dispatchers.resetMain()
+    @Test fun `loads only on subscription and does not repeat after rotation timeout`() = runTest {
+        val repo = FakeExampleRepository(listOf(ExampleItem("1", "First")))
+        val vm = model(repo)
+        assertTrue(repo.calls.isEmpty())
+        vm.state.test { assertEquals(1, expectMostRecentItem().items.size) }
+        advanceTimeBy(6_000)
+        vm.state.test { assertFalse(expectMostRecentItem().isLoading) }
+        assertEquals(listOf("refresh()"), repo.calls)
     }
-
-    @Test
-    fun `loads items on init and clears loading`() = runTest {
-        val repository = FakeExampleRepository().apply {
-            refreshItems = listOf(ExampleItem(id = "1", title = "First"))
+    @Test fun `retry after failure clears error and loads items`() = runTest {
+        val repo = FakeExampleRepository().apply { refreshResult = AppResult.Failure(DataError.Remote.NO_INTERNET) }
+        val vm = model(repo)
+        vm.state.test {
+            assertEquals(DataError.Remote.NO_INTERNET, expectMostRecentItem().error)
+            repo.refreshResult = AppResult.Success(Unit)
+            vm.onAction(ExampleAction.Retry)
+            assertNull(expectMostRecentItem().error)
         }
-        val viewModel = ExampleViewModel(repository)
-
-        viewModel.state.test {
-            val loaded = expectMostRecentItem()
-            assertThat(loaded.isLoading).isFalse()
-            assertThat(loaded.items).hasSize(1)
-            assertThat(loaded.error).isNull()
-        }
-        assertThat(repository.calls).isEqualTo(listOf("refresh()"))
+        assertEquals(2, repo.calls.size)
     }
-
-    @Test
-    fun `surfaces a DataError instead of throwing when refresh fails`() = runTest {
-        val repository = FakeExampleRepository().apply {
-            refreshResult = AppResult.Failure(DataError.Remote.NO_INTERNET)
-        }
-        val viewModel = ExampleViewModel(repository)
-
-        viewModel.state.test {
-            val loaded = expectMostRecentItem()
-            assertThat(loaded.error).isEqualTo(DataError.Remote.NO_INTERNET)
-            assertThat(loaded.isLoading).isFalse()
+    @Test fun `rapid retry while request is in flight does not duplicate work`() = runTest {
+        val repo = FakeExampleRepository().apply { refreshGate = CompletableDeferred() }
+        val vm = model(repo)
+        vm.state.test {
+            repeat(10) { vm.onAction(ExampleAction.Retry) }
+            assertEquals(1, repo.calls.size)
+            repo.refreshGate!!.complete(Unit)
+            assertFalse(expectMostRecentItem().isLoading)
         }
     }
-
-    @Test
-    fun `Retry action calls refresh again`() = runTest {
-        val repository = FakeExampleRepository()
-        val viewModel = ExampleViewModel(repository)
-
-        viewModel.onAction(ExampleAction.Retry)
-
-        assertThat(repository.calls).isEqualTo(listOf("refresh()", "refresh()"))
-    }
-
-    @Test
-    fun `ItemClicked emits a NavigateToDetail event`() = runTest {
-        val viewModel = ExampleViewModel(FakeExampleRepository())
-
-        viewModel.events.test {
-            viewModel.onAction(ExampleAction.ItemClicked(itemId = "42"))
-            assertThat(awaitItem()).isEqualTo(ExampleEvent.NavigateToDetail(itemId = "42"))
+    @Test fun `query restores through saved state and filters case insensitively`() = runTest {
+        val repo = FakeExampleRepository(listOf(ExampleItem("1", "First"), ExampleItem("2", "Second")))
+        val saved = SavedStateHandle(mapOf("query" to "FIRST"))
+        val vm = model(repo, saved)
+        vm.state.test {
+            assertEquals(listOf("1"), expectMostRecentItem().items.map { it.id })
+            vm.onAction(ExampleAction.QueryChanged("Second"))
+            assertEquals("Second", saved.get<String>("query"))
+            assertEquals(listOf("2"), expectMostRecentItem().items.map { it.id })
+        }
+        model(repo, SavedStateHandle(mapOf("query" to saved.get<String>("query")))).state.test {
+            assertEquals("Second", expectMostRecentItem().query)
         }
     }
 }

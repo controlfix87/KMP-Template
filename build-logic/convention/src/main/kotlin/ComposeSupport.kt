@@ -40,6 +40,8 @@ internal fun KotlinMultiplatformExtension.configureComposeSourceSets(project: Pr
         implementation(libs.lib("androidx-lifecycle-viewmodel-compose"))
         implementation(libs.lib("androidx-lifecycle-runtime-compose"))
         implementation(libs.lib("androidx-navigation-compose"))
+        implementation(libs.lib("androidx-lifecycle-viewmodel-navigation3"))
+        implementation(libs.lib("androidx-lifecycle-viewmodel-savedstate"))
 
         implementation(libs.lib("coil-compose"))
         implementation(libs.lib("coil-network-ktor3"))

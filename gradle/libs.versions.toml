@@ -14,7 +14,7 @@ kotlinx-datetime = "0.6.2"
 # --- androidx ---
 androidx-lifecycle = "2.10.0"
 androidx-activity = "1.13.0"
-androidx-navigation-cmp = "2.9.2"
+androidx-navigation-cmp = "1.1.1"
 androidx-core = "1.18.0"
 
 # --- storage ---
@@ -30,16 +30,17 @@ assertk = "0.28.1"
 mockk = "1.14.11"
 robolectric = "4.16.1"
 androidx-test-junit = "1.3.0"
+androidx-compose-ui = "1.11.2"
 androidx-espresso = "3.7.0"
 
-# --- sdk levels: this host's SDK only has 35/36/37 installed, and 37 forces
-# newer androidx minimums than pinned above — keep this at 36 until you bump
-# androidx-lifecycle/androidx-core together with it. See docs in CLAUDE.md.
-android-compileSdk = "36"
+# Android 17 baseline; keep minSdk independent of targetSdk.
+android-compileSdk = "37"
 android-minSdk = "26"
-android-targetSdk = "36"
+android-targetSdk = "37"
 
 [libraries]
+androidx-compose-ui-test = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "androidx-compose-ui" }
+androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "androidx-compose-ui" }
 # --- kotlinx ---
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
@@ -70,10 +71,12 @@ coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.r
 # --- androidx / compose ---
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-savedstate = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
-androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "androidx-navigation-cmp" }
+androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "androidx-navigation-cmp" }
 
 # --- storage ---
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }

@@ -22,15 +22,12 @@ class KmpFeatureConventionPlugin : Plugin<Project> {
             jvmToolchain(21)
             configureAndroidTarget(this@with)
             if (iosEnabled) {
-                iosArm64(); iosSimulatorArm64(); iosX64()
+                iosArm64(); iosSimulatorArm64()
             }
             configureComposeSourceSets(this@with)
         }
 
-        // The module dependency rule (see README's architecture section) is
-        // enforced here rather than left to each feature's build script to
-        // remember: features never depend on other features; anything shared
-        // moves into :core.
+        // Default core dependencies; scripts/check_project.py guards explicit module boundaries.
         dependencies {
             add("commonMainImplementation", project(":core:model"))
             add("commonMainImplementation", project(":core:common"))

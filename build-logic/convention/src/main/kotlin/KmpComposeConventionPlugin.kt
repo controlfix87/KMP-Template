@@ -16,7 +16,7 @@ class KmpComposeConventionPlugin : Plugin<Project> {
             jvmToolchain(21)
             configureAndroidTarget(this@with)
             if (iosEnabled) {
-                iosArm64(); iosSimulatorArm64(); iosX64()
+                iosArm64(); iosSimulatorArm64()
             }
             configureComposeSourceSets(this@with)
         }

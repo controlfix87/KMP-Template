@@ -1,157 +1,149 @@
 # KMPTemplate
 
-A from-scratch Kotlin Multiplatform + Android starter, assembled from the
-patterns that are actually proven across the other KMP projects on this
-machine (jellyMote, freestore, eizeseret) rather than written from a generic
-tutorial. Clone this, rename the package, delete `feature/example`, start
-adding real features.
+Android + iOS Kotlin Multiplatform starter with an offline sample, shared Compose UI,
+Navigation 3, Koin, state restoration, tested networking, and repeatable project generation.
+Android compiles and targets **Android 17 / API 37**, with **minSdk 26**.
 
-## Stack
+## Create a project
 
-Kotlin 2.4.10 · AGP 9.3.1 · Gradle 9.6.1 · Compose Multiplatform 1.11.1 ·
-Ktor 3.5.2 (client) · Koin 4.2.2 · kotlinx.coroutines 1.11.0 ·
-kotlinx.serialization 1.11.0 · Room 2.8.4 / DataStore 1.2.1 (wired in the
-catalog, not yet used by any module) · JUnit5 + Turbine + AssertK + MockK +
-Robolectric for tests.
+From this template directory:
 
-Every version lives in `gradle/libs.versions.toml` — nowhere else.
+```bash
+python3 scripts/new_project.py --name MyNotes --package com.example.mynotes --destination ../MyNotes
+cd ../MyNotes
+# Set ANDROID_HOME, or create local.properties containing sdk.dir=/your/android/sdk
+./scripts/verify.sh
+```
+
+Use a PascalCase project name and lowercase reverse-DNS package. The destination must
+not exist and must be outside the template. The generator renames Kotlin packages,
+application/theme classes, namespaces, plugin IDs, root project, Swift host and display
+name. It copies a fixed set of template files and excludes `.git`, build/cache output,
+local settings and signing files. It never creates a remote repository or publishes.
+
+The demo runs without a server, API key, database, signing secret, or internet request.
+Gradle's first build still needs network access to download its toolchain dependencies.
+Replace the sample when creating your first real feature; keep its restoration/testing patterns.
+
+## Requirements and targets
+
+- JDK 21; use the checked-in Gradle wrapper (distribution checksum is pinned).
+- Android SDK platform `platforms;android-37.0` and compatible build tools.
+- Python 3.11+ for project generation/static checks (no Python packages required).
+- macOS with Xcode and XcodeGen for iOS. Apple Silicon targets: device ARM64 and simulator ARM64.
+- Android/Linux builds do not configure Apple targets. macOS enables them automatically;
+  override with `-Pkmptemplate.enableIos=true` or `false`.
+
+Versions are centralized in `gradle/libs.versions.toml`; this is a tested pinned baseline,
+not a promise that each dependency is the newest available. Navigation 3 uses the
+JetBrains multiplatform artifacts. Database/storage catalog entries are optional;
+no database plugin or schema is imposed on a new app before it needs persistence.
 
 ## Module map
 
-```
-core/model          pure Kotlin domain types, shared with any future server/CLI
-core/common          AppResult/AppError/DataError, DispatcherProvider
-core/designsystem     theme, typography, ALL user-facing strings (composeResources)
-core/network          Ktor HttpClient factory (expect/actual engine)
-feature/example       one full vertical slice: domain -> data -> ui (MVI) -> di -> navigation
-androidApp            Koin startKoin, NavHost, KoinModulesTest
-build-logic/convention  4 convention plugins every module applies instead of hand-rolling its build script
-```
+| Module | Responsibility |
+|---|---|
+| `core:model` | Pure shared domain models, JVM + optional iOS |
+| `core:common` | Typed results/errors, coroutine dispatcher abstraction |
+| `core:designsystem` | Shared theme and English/Hebrew resources |
+| `core:network` | HTTPS Ktor client, timeouts, redacted optional logging, OkHttp/Darwin engines |
+| `feature:example` | Repository seam, offline demo, tested HTTP adapter, MVI list/search and detail entries |
+| `sharedApp` | Shared navigation, serializable keys and production Koin module list; iOS framework |
+| `androidApp` | Android Application/Activity, edge-to-edge, Android/device tests |
+| `iosApp` | SwiftUI host and reproducible XcodeGen specification |
+| `build-logic:convention` | Pure, platform-library, Compose and feature plugins |
 
-### Dependency rule
+Feature modules never depend on another feature; share contracts in core modules.
+Keep feature domain/data/ui/di/navigation packages together until separate compilation
+or ownership merits layer modules. Pure modules must not import Android/JVM-specific
+APIs into common source sets. Platform interfaces use expect/actual or injection.
 
-`feature/*` never depends on another `feature/*` module. Anything two features
-need moves into `core/*`. `core/designsystem` never depends on `feature/*`
-(that would cycle). This is enforced in code, not just by convention — see
-`KmpFeatureConventionPlugin.kt`'s trailing `dependencies { ... }` block.
+## Rotation, resizing and edge-to-edge
 
-### Convention plugins (`build-logic/convention`)
+The Android Activity calls `enableEdgeToEdge()` and allows normal recreation. There is
+no orientation lock, resizability opt-out or blanket `configChanges` declaration.
+Android 17 does not honor large-screen orientation restrictions, so locking is not a
+state-preservation mechanism.
 
-| Plugin ID | Targets | Use for |
-|---|---|---|
-| `kmptemplate.kmp.pure` | JVM (+ iOS opt-in) | platform-neutral modules: models, small utilities |
-| `kmptemplate.kmp.library` | Android + JVM-ish (+ iOS opt-in) | data-layer modules: network, database, datastore |
-| `kmptemplate.kmp.compose` | + Compose Multiplatform | shared UI with no feature dependency (design system) |
-| `kmptemplate.kmp.feature` | + Koin + navigation, pre-wired to `core:model`/`core:common`/`core:designsystem` | one per screen/flow |
+The shared Navigation 3 stack is saved with explicit serializers for Android and iOS.
+Entries own their ViewModels and saveable UI state. Search text is stored in
+`SavedStateHandle`; lists use saveable lazy-list state and stable item keys. Initial
+loading starts on subscription once per ViewModel, and concurrent retries share one
+in-flight operation. Repeated clicks cannot stack identical detail destinations.
 
-Adding a module is: pick the right plugin, apply it, done — not hand-copying
-15 lines of `kotlin { androidTarget { ... } }` boilerplate into a new
-`build.gradle.kts`.
+Each screen's Scaffold owns `safeDrawing` insets. Content consumes that padding before
+applying IME padding. Lists/forms scroll in short windows and are width-limited on wide
+ones. This starter supplies responsive single-pane layouts, not a complete foldable
+multi-pane design for every future product.
 
-## Renaming this template
+The device suite distinguishes real phone rotation from Activity recreation. Manual
+process-death, foldable/freeform, RTL, font-scale and IME checks are in
+[the test matrix](docs/TESTING.md). Compiling device tests does not prove they ran.
 
-1. Global find/replace `com.kmptemplate` → your real package, in every `.kt`
-   file, every `build.gradle.kts` (`namespace`/`applicationId`), and
-   `BuildLogicExt.kt`'s `moduleNamespace`.
-2. Rename `KMPTemplate` → your app name in `settings.gradle.kts`
-   (`rootProject.name`), the theme composable (`KMPTemplateTheme`), the
-   `Application` subclass, and `AndroidManifest.xml`.
-3. Delete `feature/example` (domain, data, ui, di, navigation, and its
-   commonTest) and its two registrations (`settings.gradle.kts`'s `include`,
-   `KMPTemplateApplication`'s `modules(...)` list) once you have a real first
-   feature to replace it with. Keep the *shape* — domain/data/ui/di/navigation
-   packages, a Fake*Repository test double, a `checkModules()` entry.
-4. Add a real launcher icon (`androidApp/src/main/res/mipmap-*/ic_launcher.*`)
-   — the manifest currently has none and falls back to the platform default.
-
-## Test commands
-
-KMP modules do **not** use `./gradlew test` — that silently runs almost
-nothing. Use:
+## Verification
 
 ```bash
-./gradlew :core:model:allTests :core:common:allTests   # pure-Kotlin modules
-./gradlew testAndroidHostTest                            # every KMP module's Android-host tests (incl. :feature:example)
-./gradlew :androidApp:testDebugUnitTest                   # :androidApp itself (a plain com.android.application) + KoinModulesTest
-./gradlew :androidApp:assembleDebug                        # does it actually build an APK
+./scripts/verify.sh
+./gradlew :androidApp:assembleRelease
+# A connected test device/emulator is required:
+./gradlew :androidApp:connectedDebugAndroidTest
 ```
 
-`./scripts/check_common_main_purity.sh` catches an `android.*`/`java.time`
-import leaking into `commonMain`/`commonTest` before you even run Gradle.
+`verify.sh` runs static checks, Python generator/checker tests, pure common tests, KMP
+Android host tests, Android app unit tests, lint and both app/test APK compilation.
+Do not substitute a bare `./gradlew test`: different module types expose different tasks.
+`core:model` has no behavior tests because it currently contains only a data class.
 
-## Three real bugs this template's own build caught (keep an eye out for these)
+CI adds APIs 26/35/37 device lanes, a renamed-project build, release shrinking, and a
+macOS shared-framework/Swift-host lane. Workflow definitions are provided; see
+[validation evidence](docs/VALIDATION.md) for what actually ran in this session.
 
-Verified by actually building this template end to end, not just written from
-memory — worth knowing before you hit the same class of error and burn time
-on it:
+## iOS
 
-1. **A literal `--` inside an XML `<!-- -->` comment breaks the build**, both
-   in a manifest (`ManifestMerger2$MergeFailureException`) and in Compose
-   Multiplatform's string-resource converter (a generic, line-number-free
-   `XML file ... is not valid. Check the file content.` — it swallows the
-   real parser exception). This is standard XML — comments may never contain
-   `--` except as the closing delimiter — but AGP's and CMP's error messages
-   for it are bad enough to cost real debugging time. Write `omitted: it`, not
-   `omitted -- it`, in an XML comment.
-2. **Kotlin block comments nest.** Writing a literal `/*` inside a `/** ... */`
-   KDoc comment (e.g. describing a glob like `di/*Module.kt`) opens a *nested*
-   comment that the doc's own closing `*/` then closes instead of the outer
-   one — silently swallowing every line of real code after it into the
-   comment, which surfaces as a confusing "Unresolved reference" error in a
-   completely different file that used to compile fine. Don't put `/*` inside
-   a KDoc comment's prose, even to describe a file glob.
-3. **`implementation`, not `api`, on a dependency whose type is part of your
-   own public API silently breaks downstream consumers**, not the module
-   that got it wrong. `core/network`'s `createHttpClient()` returns Ktor's
-   `HttpClient`; declaring `implementation(libs.ktor.client.core)` there
-   compiled `core:network` itself just fine, then failed `:androidApp` with
-   `Cannot access class 'io.ktor.client.HttpClient'` for a dependency
-   `androidApp` never touches directly. If a public function's signature
-   exposes a type, that dependency needs `api(...)`, not
-   `implementation(...)`.
+```bash
+brew install xcodegen
+./scripts/ios-project.sh
+open iosApp/KMPTemplate.xcodeproj
+```
 
-## Host notes (aarch64 Linux SBC)
+Choose the KMPTemplate scheme and an Apple Silicon simulator. The Xcode build phase
+builds/embeds `SharedApp`; no manually copied framework is required. Simulator builds
+need no distribution signing. Set your development team for a physical device.
+The SwiftUI wrapper delegates safe areas to Compose. The project supports both phone
+and tablet orientations. iOS build/link/runtime acceptance still requires a Mac;
+Linux compilation results are not evidence of an iOS build.
 
-If you're on the same kind of machine this was bootstrapped on:
+## Add the first feature
 
-- Kotlin/Native publishes no `linux-aarch64` host compiler at all. iOS targets
-  are opt-in (`-Pkmptemplate.enableIos=true`) and will not configure without
-  a Mac or macOS CI, full stop — see `BuildLogicExt.kt`.
-- Android build-tools are x86_64 and run under qemu. `aapt2` is already
-  overridden globally in `~/.gradle/gradle.properties`
-  (`android.aapt2FromMavenOverride`) — don't redo that per-project.
-  `android.enableResourceOptimizations=false` is set in this project's
-  `gradle.properties` because the release resource-optimize step corrupts
-  APKs under emulation.
-- Install with a real `adb` (`/usr/bin/adb install ...`), not
-  `./gradlew installDebug` — the SDK's bundled `adb` is x86_64 and hangs
-  under qemu on some hosts.
-- Robolectric cannot run here (no conscrypt native lib for linux-aarch64).
-  `KoinModulesTest` mocks `Context` directly instead of using Robolectric for
-  exactly this reason — keep doing that rather than reaching for Robolectric
-  in a module that needs to run in this repo's CI/local loop. A Room DB test
-  that genuinely needs Robolectric should live in a JVM-only `jvmTest` source
-  set instead (Room's plain-JVM builder needs no `Context`) — see eizeseret's
-  `core/database` module for the worked pattern.
-- `grep CLASSPATH= gradlew` returning nothing is normal on Gradle 9 (it uses
-  `-jar`), not a sign of a broken wrapper.
+1. Apply a convention plugin, create commonMain/commonTest sources and include the module.
+2. Put framework-independent contracts/models in domain; implement transport/persistence in data.
+3. Add State/Action/ViewModel and stateless Screen/Root. Save scalar IDs/drafts, not whole models.
+4. Expose Nav3 entries and serializable keys; use callbacks for cross-feature navigation.
+5. Register key serializers and the feature's module in `sharedApp/App.kt`. The DI test
+   consumes that exact production module list; extend its resolution assertions for new roots.
+6. Add fake-backed tests and relevant restoration/device cases in the same change.
+7. Remove the example include/dependency/module/routes/serializers/tests only after the real
+   feature replaces it. Replace the neutral launcher icon with the product's approved artwork.
 
-## Hard rules
+For HTTP, inject one `createHttpClient("https://your.service/api/")` instance and close
+it with its owning scope. Use relative endpoint paths. Logging defaults off and omits
+bodies; review URL query content before enabling logs. The optional HTTP sample maps
+expected transport/status/serialization errors and rethrows cancellation.
 
-- No `android.*`, `java.time`, `java.util.UUID` in `commonMain`/`commonTest`.
-  Platform-bound things go behind `expect`/`actual` (see `core/network`'s
-  `HttpClientFactory`). CI enforces this before Gradle even runs.
-- State classes carry no UI types — no string resources, no `Color`, no
-  painters. Errors are `DataError`/`AppError` enums; the Screen composable is
-  the only place that turns one into a localized string.
-- Every feature module owns a `di/*Module.kt` and is registered in both
-  `KMPTemplateApplication` (real app) and `KoinModulesTest` (build-time DI
-  check) in the same commit.
-- Test doubles are hand-written `Fake*` classes implementing the real
-  interface (see `feature/example/testutil/FakeExampleRepository.kt`), not
-  mocks of your own repository interfaces — a fake that tracks calls catches
-  wiring bugs a relaxed mock hides. Mocking is fine for third-party/SDK types
-  you don't own (see `KoinModulesTest`'s mocked `Context`).
-- Hebrew strings go in `values-iw`, not `values-he` — Android's legacy ISO
-  code for Hebrew is `iw`; `values-he` silently fails to match on some
-  devices. Only relevant once you add a second locale.
+For persistence, follow [migration infrastructure](docs/PERSISTENCE.md). Existing apps
+must retain their schema and identity continuity; a template is not a replacement for
+an upgrade plan. Authentication, background scheduling, analytics, billing and database
+features are deliberately added when a product needs them.
+
+## Host notes
+
+This workspace uses ARM64 Linux. Android build tools may need an existing host-local
+`aapt2` wrapper; do not commit absolute SDK/tool paths. If resource optimization is
+broken under local emulation, override it locally rather than disabling release
+optimization for everyone. Robolectric native dependencies may be unavailable here;
+use device tests for actual platform behavior. Kotlin/Native framework linking needs
+macOS. Debug builds run without credentials; release output is unsigned until a
+product supplies its signing configuration.
+
+See [implementation tasks](TASKS.md), [testing](docs/TESTING.md),
+[validation](docs/VALIDATION.md), and the workspace [project plans](../MODERNIZATION.md).

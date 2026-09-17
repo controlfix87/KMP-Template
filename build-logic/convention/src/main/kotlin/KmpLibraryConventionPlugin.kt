@@ -21,7 +21,6 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
             if (iosEnabled) {
                 iosArm64()
                 iosSimulatorArm64()
-                iosX64()
             }
 
             sourceSets.getByName("commonMain").dependencies {

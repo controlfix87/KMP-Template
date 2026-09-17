@@ -13,15 +13,9 @@ internal fun VersionCatalog.lib(alias: String) = findLibrary(alias).get()
 
 internal fun VersionCatalog.bundle(alias: String) = findBundle(alias).get()
 
-/**
- * Apple targets need a macOS host to *link* a .framework, and Kotlin/Native
- * publishes no linux-aarch64 host compiler at all -- so on an aarch64 Linux dev
- * box (the profile this template was bootstrapped on), configuring an iOS
- * target fails before any of your code even compiles. Keep iOS opt-in with
- * -Pkmptemplate.enableIos=true on a Mac or in macOS CI. See CLAUDE.md.
- */
+/** Enable Apple targets by default on macOS; Linux ARM64 cannot link Apple frameworks. */
 internal val Project.iosEnabled: Boolean
-    get() = providers.gradleProperty("kmptemplate.enableIos").orNull?.toBoolean() ?: false
+    get() = providers.gradleProperty("kmptemplate.enableIos").orNull?.toBoolean() ?: (System.getProperty("os.name") == "Mac OS X")
 
 /** Reverse-DNS namespace derived from the module path, e.g. :core:model -> com.kmptemplate.core.model */
 internal val Project.moduleNamespace: String

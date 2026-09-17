@@ -22,10 +22,7 @@ android {
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // 10.0.2.2 is the emulator's alias for the host machine's localhost.
-        // A physical device on the same network needs the host's real LAN IP
-        // instead. Point this at a real backend once one exists.
-        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8080/\"")
+
     }
 
     buildFeatures {
@@ -54,7 +51,6 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
-            isReturnDefaultValues = true
             all { it.useJUnitPlatform() }
         }
     }
@@ -65,6 +61,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":sharedApp"))
     implementation(project(":core:model"))
     implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
@@ -99,6 +96,8 @@ dependencies {
     testImplementation(libs.koin.test)
     testImplementation(libs.mockk)
 
+    androidTestImplementation(libs.androidx.compose.ui.test)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

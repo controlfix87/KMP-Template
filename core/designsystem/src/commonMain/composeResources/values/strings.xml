@@ -7,4 +7,8 @@
     <string name="example_retry">Retry</string>
     <string name="example_error_no_internet">No internet connection</string>
     <string name="example_error_generic">Something went wrong</string>
+    <string name="example_search">Search sample items</string>
+    <string name="example_empty">No matching items</string>
+    <string name="example_detail">Item %1$s</string>
+    <string name="example_back">Back</string>
 </resources>

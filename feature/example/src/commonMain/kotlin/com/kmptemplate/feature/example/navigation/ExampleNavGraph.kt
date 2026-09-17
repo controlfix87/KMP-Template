@@ -1,18 +1,11 @@
 package com.kmptemplate.feature.example.navigation
 
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import com.kmptemplate.feature.example.ui.ExampleRoute
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import com.kmptemplate.feature.example.ui.ExampleRoot
+import com.kmptemplate.feature.example.ui.ExampleDetailScreen
 
-/**
- * Every feature exposes exactly one `NavGraphBuilder` extension like this.
- * :androidApp's top-level NavHost composes these together and owns the
- * single shared NavController -- a feature module never creates its own.
- */
-fun NavGraphBuilder.exampleNavGraph(onNavigateToDetail: (String) -> Unit) {
-    composable<ExampleRoute.List> {
-        ExampleRoute(onNavigateToDetail = onNavigateToDetail)
-    }
-    // ExampleRoute.Detail intentionally left unimplemented -- this template
-    // stops at "one working screen + navigation event", not a full detail flow.
+fun EntryProviderScope<NavKey>.exampleEntries(onDetail: (String) -> Unit, onBack: () -> Unit) {
+    entry<ExampleRoute.List> { ExampleRoot(onNavigateToDetail = onDetail) }
+    entry<ExampleRoute.Detail> { key -> ExampleDetailScreen(key.itemId, onBack) }
 }

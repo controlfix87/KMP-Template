@@ -7,3 +7,12 @@ local.properties
 .idea/
 *.hprof
 .DS_Store
+__pycache__/
+*.pyc
+*.keystore
+*.jks
+*.p12
+.env
+.env.*
+*.xcodeproj/
+DerivedData/

@@ -11,7 +11,7 @@ task status.
 |---|---|---|
 | Static project checks (purity, localization, module boundaries, manifest) | `python3 scripts/check_project.py` | Pass |
 | Generator/checker unit tests | `python3 -m unittest discover -s scripts/tests -v` | 6 tests, pass |
-| Shared/common tests | `./gradlew :core:model:allTests :core:common:allTests` | Pass |
+| Shared/common tests | `./gradlew :common:core:model:allTests :common:core:common:allTests` | Pass |
 | Feature ViewModel/HTTP/DI host tests | `./gradlew testAndroidHostTest` | Pass |
 | Android app unit tests (Koin module resolution) | `./gradlew :androidApp:testDebugUnitTest` | Pass |
 | Lint | `./gradlew :androidApp:lintDebug` | 1 informational warning only (`DataExtractionRules` attribute is a no-op below API 31, by design since minSdk is 26); no actionable findings |
@@ -25,7 +25,7 @@ task status.
 
 | Check | Command | Result |
 |---|---|---|
-| Locale unit tests | `./gradlew :core:designsystem:testAndroidHostTest` | `AppLocaleTest`, 11 tests, 0 failures (shipped-language set, code round-trip, RTL set, legacy `iw`→`he` normalisation, and `LocaleManager` repairing **and persisting** a missing/unrecognised preference) |
+| Locale unit tests | `./gradlew :common:core:designsystem:testAndroidHostTest` | `AppLocaleTest`, 11 tests, 0 failures (shipped-language set, code round-trip, RTL set, legacy `iw`→`he` normalisation, and `LocaleManager` repairing **and persisting** a missing/unrecognised preference) |
 | Locale in the production DI graph | `./gradlew :androidApp:testDebugUnitTest` | `KoinModulesTest`, 2 tests, 0 failures — `LocaleManager` now resolves from `appModules` |
 | Required-locale + string parity | `python3 scripts/check_project.py` | Pass, with `REQUIRED_LOCALES = ('he', 'iw', 'ru', 'fr')` enforced alongside the existing key/placeholder parity |
 | Checker tests, including the new required-locale case | `python3 -m unittest discover -s scripts/tests` | 9 tests, pass (`test_missing_required_locale_fails` deletes a locale directory and asserts the checker reports it) |
@@ -44,7 +44,7 @@ and reverted an externally-set per-app locale. That is evidence for the approach
 template's build of it. Rotation was not covered even there — the phone was locked throughout, so
 `user_rotation` never took effect.
 
-**iOS: written, never compiled, never run.** `core/designsystem/src/iosMain/.../i18n/` has no
+**iOS: written, never compiled, never run.** `common/core/designsystem/src/iosMain/.../i18n/` has no
 compilation on this ARM64 Linux host (iOS targets are off unless `kmptemplate.enableIos=true` or
 macOS). Beyond compilation it carries a documented CMP 1.11.1 limitation — see
 [LOCALIZATION.md](LOCALIZATION.md).

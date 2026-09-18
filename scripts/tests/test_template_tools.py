@@ -13,7 +13,7 @@ class TemplateToolsTest(unittest.TestCase):
     def test_nested_platform_leak_fails(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            path = root / 'feature/foo/domain/src/commonMain/kotlin/Bad.kt'
+            path = root / 'common/feature/foo/domain/src/commonMain/kotlin/Bad.kt'
             path.parent.mkdir(parents=True)
             path.write_text('import java.time.Instant\n')
             self.assertEqual(1, len(load('check_project').purity(root)))
@@ -23,7 +23,7 @@ class TemplateToolsTest(unittest.TestCase):
     def test_nested_android_only_androidx_leak_fails(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            path = root / 'feature/foo/data/src/commonMain/kotlin/Bad.kt'
+            path = root / 'common/feature/foo/data/src/commonMain/kotlin/Bad.kt'
             path.parent.mkdir(parents=True)
             path.write_text('import androidx.work.WorkManager\n')
             self.assertEqual(1, len(load('check_project').purity(root)))
@@ -33,17 +33,17 @@ class TemplateToolsTest(unittest.TestCase):
     def test_nested_direct_dispatchers_import_fails_outside_dispatcher_provider(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            bad = root / 'core/foo/src/commonMain/kotlin/Bad.kt'
+            bad = root / 'common/core/foo/src/commonMain/kotlin/Bad.kt'
             bad.parent.mkdir(parents=True)
             bad.write_text('import kotlinx.coroutines.Dispatchers\n')
             self.assertEqual(1, len(load('check_project').purity(root)))
 
-            allowed = root / 'core/common/src/commonMain/kotlin/DispatcherProvider.kt'
+            allowed = root / 'common/core/common/src/commonMain/kotlin/DispatcherProvider.kt'
             allowed.parent.mkdir(parents=True, exist_ok=True)
             allowed.write_text('import kotlinx.coroutines.Dispatchers\n')
             self.assertEqual(1, len(load('check_project').purity(root)))
 
-            test_file = root / 'feature/foo/src/commonTest/kotlin/FooTest.kt'
+            test_file = root / 'common/feature/foo/src/commonTest/kotlin/FooTest.kt'
             test_file.parent.mkdir(parents=True)
             test_file.write_text('import kotlinx.coroutines.Dispatchers\n')
             bad.unlink()
@@ -75,7 +75,7 @@ class TemplateToolsTest(unittest.TestCase):
         module = load('check_project')
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            base = root / 'core/designsystem/src/commonMain/composeResources'
+            base = root / 'common/core/designsystem/src/commonMain/composeResources'
             body = '<resources><string name="a">x</string></resources>'
             for folder in ('values', *(f'values-{code}' for code in module.REQUIRED_LOCALES)):
                 (base / folder).mkdir(parents=True)

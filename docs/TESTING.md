@@ -12,8 +12,8 @@ empty tests just to increase counts.
 
 | Suite | Task | Regression contract |
 |---|---|---|
-| Result helpers | `:core:common:allTests` | Success/failure transformations preserve values and types |
-| ViewModel | `:feature:example:testAndroidHostTest` | Lazy initial load, resubscription, retry single-flight, saved query |
+| Result helpers | `:common:core:common:allTests` | Success/failure transformations preserve values and types |
+| ViewModel | `:common:feature:example:testAndroidHostTest` | Lazy initial load, resubscription, retry single-flight, saved query |
 | HTTP adapter | same feature task | Base-path joining, statuses, malformed JSON, cancellation, HTTPS validation |
 | DI | `:androidApp:testDebugUnitTest` | Real module list resolves repository and entry ViewModel |
 | Device | `:androidApp:connectedDebugAndroidTest` | Query/detail restoration, real phone rotation, safe drawing bounds |

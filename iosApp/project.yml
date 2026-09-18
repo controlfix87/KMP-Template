@@ -18,14 +18,14 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
         TARGETED_DEVICE_FAMILY: '1,2'
-        FRAMEWORK_SEARCH_PATHS: '$(inherited) $(SRCROOT)/../sharedApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)'
+        FRAMEWORK_SEARCH_PATHS: '$(inherited) $(SRCROOT)/../common/sharedApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)'
         OTHER_LDFLAGS: '$(inherited) -framework SharedApp'
         ENABLE_USER_SCRIPT_SANDBOXING: NO
     preBuildScripts:
       - name: Build Kotlin framework
         script: |
           cd "$SRCROOT/.."
-          ./gradlew -Pkmptemplate.enableIos=true :sharedApp:embedAndSignAppleFrameworkForXcode
+          ./gradlew -Pkmptemplate.enableIos=true :common:sharedApp:embedAndSignAppleFrameworkForXcode
         basedOnDependencyAnalysis: false
 schemes:
   KMPTemplate:

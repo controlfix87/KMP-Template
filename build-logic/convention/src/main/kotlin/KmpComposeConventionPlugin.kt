@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * Compose Multiplatform library with no dependency on the feature stack.
  * Use this for a shared design-system module (theme, typography, shared
  * composables, strings) that everything else builds on top of -- it must not
- * itself depend on any :feature:* module, or the dependency graph cycles back.
+ * itself depend on any :common:feature:* module, or the dependency graph cycles back.
  */
 class KmpComposeConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {

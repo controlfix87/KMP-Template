@@ -7,7 +7,7 @@ Read README.md and TASKS.md. Record validation honestly in docs/VALIDATION.md.
 - Every dependency version belongs in gradle/libs.versions.toml. Verify compatibility before upgrades.
 - No Android/Java imports in commonMain/commonTest. Domain state contains no UI resources.
 - Keep feature dependencies independent; use shared contracts and callbacks across features.
-- Register actual DI modules once in sharedApp/App.kt; resolve feature roots in the app DI test.
+- Register actual DI modules once in common/sharedApp/App.kt; resolve feature roots in the app DI test.
 - Save minimal route/draft state, retain normal Activity recreation, guard duplicate operations.
 - Add English/Hebrew keys and formatting placeholders together.
 - Use fake repositories for owned abstractions; cancellation must propagate.

@@ -66,15 +66,15 @@ Compose Resources matches a `values-<lang>` directory by exact string against
 wrong on half the fleet, and the failure is silent: Hebrew falls back to `values/`
 (English) while the layout still flips to RTL.
 
-`core/designsystem/build.gradle.kts` registers `mirrorHebrewLegacyResources`, which copies
+`common/core/designsystem/build.gradle.kts` registers `mirrorHebrewLegacyResources`, which copies
 `values-he/` → `values-iw/` on every build and is wired into the Compose resource prep
 tasks. **Edit `values-he/` only.** `values-iw/` is committed solely so a fresh checkout or
 IDE import has it before the task first runs.
 
 ## Adding a language
 
-1. An entry in `AppLocale` (`core/designsystem/.../i18n/AppLocale.kt`).
-2. `core/designsystem/src/commonMain/composeResources/values-<code>/strings.xml`, with the
+1. An entry in `AppLocale` (`common/core/designsystem/.../i18n/AppLocale.kt`).
+2. `common/core/designsystem/src/commonMain/composeResources/values-<code>/strings.xml`, with the
    *full* key set — `scripts/check_project.py` enforces key parity and placeholder parity.
 3. Add the code to `REQUIRED_LOCALES` in `scripts/check_project.py`.
 

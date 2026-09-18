@@ -61,12 +61,12 @@ android {
 }
 
 dependencies {
-    implementation(project(":sharedApp"))
-    implementation(project(":core:model"))
-    implementation(project(":core:common"))
-    implementation(project(":core:designsystem"))
-    implementation(project(":core:network"))
-    implementation(project(":feature:example"))
+    implementation(project(":common:sharedApp"))
+    implementation(project(":common:core:model"))
+    implementation(project(":common:core:common"))
+    implementation(project(":common:core:designsystem"))
+    implementation(project(":common:core:network"))
+    implementation(project(":common:feature:example"))
 
     implementation(compose.runtime)
     implementation(compose.foundation)

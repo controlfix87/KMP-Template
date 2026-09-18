@@ -63,7 +63,7 @@ internal fun KotlinMultiplatformExtension.configureAndroidTarget(project: Projec
         // modules (unlike plain android libraries, where it defaults to true).
         // Left off, AGP never wires up asset/resource merging for this module,
         // so Compose Multiplatform's generated composeResources assets (see
-        // :core:designsystem) are silently dropped and crash a consuming app
+        // :common:core:designsystem) are silently dropped and crash a consuming app
         // at runtime with MissingResourceException instead of failing the
         // build. Safe to enable unconditionally -- a no-op for modules with no
         // resources/assets of their own.

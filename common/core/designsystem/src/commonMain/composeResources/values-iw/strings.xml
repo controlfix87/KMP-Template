@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Hebrew lives here, under the modern ISO 639-1 code. The `values-iw` directory beside this one
+      is GENERATED from this file by the `mirrorHebrewLegacyResources` Gradle task - do not edit it.
+      Both are needed because Compose Resources matches a directory name by exact string against
+      `Locale.getDefault().language`, which reports Hebrew as the withdrawn 1989 code "iw" on
+      Android <= 33 and as "he" on 34+. See common/core/designsystem/build.gradle.kts.
+    -->
+    <string name="app_name">KMPTemplate</string>
+
+    <string name="example_title">דוגמה</string>
+    <string name="example_loading">טוען…</string>
+    <string name="example_retry">נסה שוב</string>
+    <string name="example_error_no_internet">אין חיבור לאינטרנט</string>
+    <string name="example_error_generic">משהו השתבש</string>
+    <string name="example_search">חיפוש פריטים לדוגמה</string>
+    <string name="example_empty">אין פריטים תואמים</string>
+    <string name="example_detail">פריט %1$s</string>
+    <string name="example_back">חזרה</string>
+
+    <string name="language">שפה</string>
+    <string name="language_close">סגור</string>
+</resources>

@@ -83,7 +83,7 @@ process-death, foldable/freeform, RTL, font-scale and IME checks are in
 ## Language
 
 English, Hebrew, Russian and French ship by default, listed once in
-`core/designsystem/.../i18n/AppLocale.kt` and backed by one `values-<code>/strings.xml`
+`common/core/designsystem/.../i18n/AppLocale.kt` and backed by one `values-<code>/strings.xml`
 each. The app language is **never** taken from the device language and changes in exactly
 one way: the user picks it in `LanguagePickerDialog`.
 
@@ -140,7 +140,7 @@ Linux compilation results are not evidence of an iOS build.
 2. Put framework-independent contracts/models in domain; implement transport/persistence in data.
 3. Add State/Action/ViewModel and stateless Screen/Root. Save scalar IDs/drafts, not whole models.
 4. Expose Nav3 entries and serializable keys; use callbacks for cross-feature navigation.
-5. Register key serializers and the feature's module in `sharedApp/App.kt`. The DI test
+5. Register key serializers and the feature's module in `common/sharedApp/App.kt`. The DI test
    consumes that exact production module list; extend its resolution assertions for new roots.
 6. Add fake-backed tests and relevant restoration/device cases in the same change.
 7. Remove the example include/dependency/module/routes/serializers/tests only after the real

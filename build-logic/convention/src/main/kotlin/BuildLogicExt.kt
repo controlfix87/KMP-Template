@@ -17,6 +17,10 @@ internal fun VersionCatalog.bundle(alias: String) = findBundle(alias).get()
 internal val Project.iosEnabled: Boolean
     get() = providers.gradleProperty("kmptemplate.enableIos").orNull?.toBoolean() ?: (System.getProperty("os.name") == "Mac OS X")
 
-/** Reverse-DNS namespace derived from the module path, e.g. :core:model -> com.kmptemplate.core.model */
+/** Reverse-DNS namespace derived from the module path, keeping `common` as a filesystem boundary rather than a package. */
 internal val Project.moduleNamespace: String
-    get() = "com.kmptemplate." + path.removePrefix(":").replace(":", ".").replace("-", "")
+    get() = "com.kmptemplate." + path
+        .removePrefix(":common:")
+        .removePrefix(":")
+        .replace(":", ".")
+        .replace("-", "")

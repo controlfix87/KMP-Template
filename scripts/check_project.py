@@ -30,7 +30,7 @@ DISPATCHERS_ALLOWED_FILE = 'DispatcherProvider.kt'
 # Every language AppLocale ships, by resource-directory suffix. A language listed in the enum with
 # no resource directory does not fail the build on its own -- Compose Resources silently falls back
 # to values/ -- so the pairing is asserted here instead. `iw` is the generated legacy mirror of `he`
-# (see core/designsystem/build.gradle.kts); it is required too, because without it Hebrew silently
+# (see common/core/designsystem/build.gradle.kts); it is required too, because without it Hebrew silently
 # renders English on Android <= 33.
 REQUIRED_LOCALES = ('he', 'iw', 'ru', 'fr')
 
@@ -49,7 +49,7 @@ def check(root, only=False):
     errors = purity(root)
     if only:
         return errors
-    base = root / 'core/designsystem/src/commonMain/composeResources'
+    base = root / 'common/core/designsystem/src/commonMain/composeResources'
     def strings(path):
         parsed = ET.parse(path)
         rows = parsed.findall('string')

@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 /**
  * Compose Multiplatform UI wiring shared by [KmpComposeConventionPlugin] and
- * [KmpFeatureConventionPlugin]. Kept separate because :core:designsystem needs
+ * [KmpFeatureConventionPlugin]. Kept separate because :common:core:designsystem needs
  * the Compose setup but must NOT pick up the feature-only project deps the way
  * [KmpFeatureConventionPlugin] adds for every actual feature.
  */

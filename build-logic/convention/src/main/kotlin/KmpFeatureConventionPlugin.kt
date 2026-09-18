@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * is all a feature's build.gradle.kts should need beyond its own dependencies.
  *
  * User-facing strings do NOT live in feature modules -- they're centralised in
- * :core:designsystem's composeResources so every locale is one diff to check.
+ * :common:core:designsystem's composeResources so every locale is one diff to check.
  * See CLAUDE.md's localization rule.
  */
 class KmpFeatureConventionPlugin : Plugin<Project> {
@@ -29,9 +29,9 @@ class KmpFeatureConventionPlugin : Plugin<Project> {
 
         // Default core dependencies; scripts/check_project.py guards explicit module boundaries.
         dependencies {
-            add("commonMainImplementation", project(":core:model"))
-            add("commonMainImplementation", project(":core:common"))
-            add("commonMainImplementation", project(":core:designsystem"))
+            add("commonMainImplementation", project(":common:core:model"))
+            add("commonMainImplementation", project(":common:core:common"))
+            add("commonMainImplementation", project(":common:core:designsystem"))
         }
     }
 }

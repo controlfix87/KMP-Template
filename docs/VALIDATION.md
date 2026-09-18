@@ -21,7 +21,37 @@ task status.
 | Renamed-project generation | `python3 scripts/new_project.py --name SmokeApp --package com.example.smokeapp --destination <tmp>` | Generated project has no leftover `kmptemplate`/`KMPTemplate` identifiers outside the generator script/tests themselves |
 | Renamed-project full verification gate | `./scripts/verify.sh` in the generated `SmokeApp` copy | Pass end-to-end (static checks, generator tests, Gradle unit tests, lint, debug + androidTest APK assembly), then deleted |
 
-Two real bugs were found and fixed while running the above, not by source review alone:
+## Language stack (TPL-016), executed 2026-09-18
+
+| Check | Command | Result |
+|---|---|---|
+| Locale unit tests | `./gradlew :core:designsystem:testAndroidHostTest` | `AppLocaleTest`, 11 tests, 0 failures (shipped-language set, code round-trip, RTL set, legacy `iw`→`he` normalisation, and `LocaleManager` repairing **and persisting** a missing/unrecognised preference) |
+| Locale in the production DI graph | `./gradlew :androidApp:testDebugUnitTest` | `KoinModulesTest`, 2 tests, 0 failures — `LocaleManager` now resolves from `appModules` |
+| Required-locale + string parity | `python3 scripts/check_project.py` | Pass, with `REQUIRED_LOCALES = ('he', 'iw', 'ru', 'fr')` enforced alongside the existing key/placeholder parity |
+| Checker tests, including the new required-locale case | `python3 -m unittest discover -s scripts/tests` | 9 tests, pass (`test_missing_required_locale_fails` deletes a locale directory and asserts the checker reports it) |
+| Full gate after the change | `./scripts/verify.sh` | Pass end-to-end |
+
+**Not executed here.** Everything about this feature that needs a device is unexecuted on this
+host: no device is attached, so the `docs/TESTING.md` "Locale stability" row — rotation, dark-mode
+toggle, font scale, split screen, background-and-return, reinstall, system-language change, each on
+a device whose system language differs from the app's — has not been run against this template.
+Likewise the API ≤ 33 Hebrew check that the generated `values-iw` mirror exists to satisfy.
+
+The same fix *was* validated on real hardware in the sibling FreeStore app it was derived from: a
+`he-IL` Samsung SM-S938B, where the app's reported configuration went from `[he_IL,en_US…] ldrtl`
+to `[en,he_IL,…] ldltr`, held through both dark-mode toggle directions and a force-stop relaunch,
+and reverted an externally-set per-app locale. That is evidence for the approach, **not** for this
+template's build of it. Rotation was not covered even there — the phone was locked throughout, so
+`user_rotation` never took effect.
+
+**iOS: written, never compiled, never run.** `core/designsystem/src/iosMain/.../i18n/` has no
+compilation on this ARM64 Linux host (iOS targets are off unless `kmptemplate.enableIos=true` or
+macOS). Beyond compilation it carries a documented CMP 1.11.1 limitation — see
+[LOCALIZATION.md](LOCALIZATION.md).
+
+## Earlier findings
+
+Two real bugs were found and fixed while running the original gate, not by source review alone:
 
 - `androidApp/build.gradle.kts` mipmap-anydpi adaptive icon appeared to be missing from
   AAPT (`resource mipmap/ic_launcher ... not found`) on a fresh `processDebugResources`

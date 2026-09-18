@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KMPTemplate</string>
+
+    <string name="example_title">Exemple</string>
+    <string name="example_loading">Chargement…</string>
+    <string name="example_retry">Réessayer</string>
+    <string name="example_error_no_internet">Aucune connexion Internet</string>
+    <string name="example_error_generic">Une erreur est survenue</string>
+    <string name="example_search">Rechercher des éléments</string>
+    <string name="example_empty">Aucun élément correspondant</string>
+    <string name="example_detail">Élément %1$s</string>
+    <string name="example_back">Retour</string>
+
+    <string name="language">Langue</string>
+    <string name="language_close">Fermer</string>
+</resources>

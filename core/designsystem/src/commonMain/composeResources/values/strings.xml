@@ -11,4 +11,10 @@
     <string name="example_empty">No matching items</string>
     <string name="example_detail">Item %1$s</string>
     <string name="example_back">Back</string>
+
+    <!-- Language picker. The languages themselves come from AppLocale.displayName as autonyms and
+         are never translated per locale: someone hunting for their language in a list they cannot
+         read needs to see it written the way they write it. -->
+    <string name="language">Language</string>
+    <string name="language_close">Close</string>
 </resources>

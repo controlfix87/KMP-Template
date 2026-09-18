@@ -45,7 +45,7 @@ no database plugin or schema is imposed on a new app before it needs persistence
 |---|---|
 | `core:model` | Pure shared domain models, JVM + optional iOS |
 | `core:common` | Typed results/errors, coroutine dispatcher abstraction |
-| `core:designsystem` | Shared theme and English/Hebrew resources |
+| `core:designsystem` | Shared theme, the language stack (`i18n/`) and English/Hebrew/Russian/French resources |
 | `core:network` | HTTPS Ktor client, timeouts, redacted optional logging, OkHttp/Darwin engines |
 | `feature:example` | Repository seam, offline demo, tested HTTP adapter, MVI list/search and detail entries |
 | `sharedApp` | Shared navigation, serializable keys and production Koin module list; iOS framework |
@@ -79,6 +79,27 @@ multi-pane design for every future product.
 The device suite distinguishes real phone rotation from Activity recreation. Manual
 process-death, foldable/freeform, RTL, font-scale and IME checks are in
 [the test matrix](docs/TESTING.md). Compiling device tests does not prove they ran.
+
+## Language
+
+English, Hebrew, Russian and French ship by default, listed once in
+`core/designsystem/.../i18n/AppLocale.kt` and backed by one `values-<code>/strings.xml`
+each. The app language is **never** taken from the device language and changes in exactly
+one way: the user picks it in `LanguagePickerDialog`.
+
+That is a deliberate stance, not a simplification. Android re-derives the process-global
+`Locale.getDefault()` — which Compose Multiplatform resolves every `stringResource()`
+from, on every recomposition — out of the *Application* context's configuration, on
+process bind and on every configuration update the process receives. An app that forces
+its language only on the Activity (the usual advice) leaves that context on the device
+language, so rotations, dark-mode toggles and background configuration updates silently
+reset it, and the wrong language then surfaces on whatever screen composes next. See
+[docs/LOCALIZATION.md](docs/LOCALIZATION.md) for the mechanism and the layered fix.
+
+Adding a language is: one `AppLocale` entry, one `values-<code>/strings.xml` with the
+full key set, and one line in `REQUIRED_LOCALES` in `scripts/check_project.py`. Hebrew is
+the exception — edit `values-he/` only; `values-iw/` is generated from it by a Gradle task
+because Android reports Hebrew as `iw` up to API 33 and as `he` from 34.
 
 ## Verification
 

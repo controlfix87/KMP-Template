@@ -51,7 +51,9 @@ force all platforms onto a JVM-only JUnit engine.
 | Insets | Cutout side/top, navigation/taskbar, IME shown/hidden | Focused field and action visible; no double padding |
 | Appearance | Light/dark and theme change | Legible text/system icons, no stale theme after recreation |
 | Accessibility | 200% text, TalkBack, external keyboard | Labels/order/focus work, 48dp targets, scrollable content |
-| Locale | English LTR and Hebrew RTL | Logical start/end order, safe mixed number/ID text |
+| Locale | English/Russian/French LTR and Hebrew RTL | Logical start/end order, safe mixed number/ID text |
+| Locale stability | On a device whose system language differs from the app's: rotate, toggle system dark mode, change font scale, enter split screen, background the app and return, reinstall the APK over itself, change the system language | The app language **never** changes. Strings and layout direction never disagree in any frame. Check a screen opened *after* each event, not only the one already on screen: the leak surfaces on the next composition, not at the moment it happens (see [LOCALIZATION.md](LOCALIZATION.md)) |
+| Locale on API ≤ 33 | Hebrew on an API 26–33 device | Hebrew *strings*, not English under an RTL layout — that pairing means the generated `values-iw` mirror did not resolve |
 | Async | Offline, timeout, malformed data, cancellation, rapid retry | Typed error, one in-flight job, recoverable state |
 | Persistence | Upgrade, partial/corrupt data, process death | No silent loss; migration/restore evidence |
 

@@ -68,6 +68,26 @@ class TemplateToolsTest(unittest.TestCase):
             with tempfile.TemporaryDirectory() as temp, self.assertRaises(ValueError):
                 module.create(Path(temp) / 'app', name, package)
 
+    def test_missing_required_locale_fails(self):
+        # A language listed in AppLocale with no values-<code>/strings.xml does not fail the build
+        # on its own -- Compose Resources silently falls back to values/ -- so a deleted directory
+        # ships as English text under, say, an RTL layout. It has to be caught here.
+        module = load('check_project')
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            base = root / 'core/designsystem/src/commonMain/composeResources'
+            body = '<resources><string name="a">x</string></resources>'
+            for folder in ('values', *(f'values-{code}' for code in module.REQUIRED_LOCALES)):
+                (base / folder).mkdir(parents=True)
+                (base / folder / 'strings.xml').write_text(body)
+            (root / 'androidApp/src/main').mkdir(parents=True)
+            (root / 'androidApp/src/main/AndroidManifest.xml').write_text('<manifest><application /></manifest>')
+
+            self.assertEqual([], module.check(root))
+
+            (base / f'values-{module.REQUIRED_LOCALES[0]}/strings.xml').unlink()
+            self.assertEqual(1, len(module.check(root)))
+
     def test_generator_supports_package_nested_under_template_package(self):
         module = load('new_project')
         with tempfile.TemporaryDirectory() as temp:

@@ -21,6 +21,7 @@ other applications. Detailed future migration tasks are in each project's
 | TPL-013 | external validation | Run instrumentation on API 26/35/37, real process-death/tablet/IME checks; no device currently attached |
 | TPL-014 | external validation | Run macOS framework tests, Swift host build and iOS simulator journey; local host is ARM64 Linux |
 | TPL-015 | done | Fixed a missing `onClose` import build bug found while running the gate; final code review pass; `docs/VALIDATION.md` records executed vs. external-validation evidence |
+| TPL-016 | done | Language stack in `core:designsystem/i18n`: English/Hebrew/Russian/French by default; one `LocaleManager` and one picker as the only way to change it; the layered Android fix that stops the platform resetting the app to the device language (Application context override, API 33+ per-app locale, config-change/resume re-assert, composition drift heal); `values-he` → `values-iw` build-time mirror so Hebrew resolves on API ≤ 33. `AppLocaleTest` (11 tests) plus a required-locale check in `scripts/check_project.py`; rationale in `docs/LOCALIZATION.md`. **iOS actuals are written but unexecuted** (ARM64 Linux host) and carry a documented CMP 1.11.1 limitation |
 
 ## Completion policy
 

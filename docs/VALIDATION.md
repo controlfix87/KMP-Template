@@ -82,6 +82,11 @@ Two real bugs were found and fixed while running the original gate, not by sourc
 
 ## Not executed here (explicitly external validation)
 
+The CI workflow retains the shrunk Android release APK/mapping outputs and
+the macOS framework/host build outputs as review artifacts when those lanes
+pass. Artifact retention makes the platform acceptance evidence inspectable
+without copying build output into the repository.
+
 - **TPL-013 — Android instrumentation on real hardware/emulators (API 26/35/37):** no
   device or emulator is attached to this host. `assembleDebugAndroidTest` compiling is
   evidence of compilation only, not of `connectedDebugAndroidTest` passing. Real phone

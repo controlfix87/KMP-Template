@@ -5,6 +5,22 @@ Reviewed 2026-09-17. The implementation tracker is `TASKS.md`; actual results be
 as part of the review. The original snapshot contained 29 Kotlin source files and four
 Kotlin files in test paths. Filename counts were not treated as executed test counts.
 
+
+## Migration status — 2026-09-19
+
+The template implementation migration is complete on `main`. Host/unit, lint, release,
+APK packaging, generator, static-guard, and localization checks are recorded in
+`docs/VALIDATION.md`. The connected Samsung SM-G950F (API 28) run also passed all three
+instrumentation tests, including recreation, safe drawing bounds, and rotation/query
+restoration. This closes the available physical-device portion of TPL-013.
+
+Still external or matrix-scoped: API 26/35/37 runtime coverage, process-death/tablet/
+IME/font-scale/RTL/split-screen/predictive-back acceptance, and Apple framework/Swift
+host/simulator validation on the MacBook Air M2. TPL-014 remains external validation;
+TPL-013 remains open only for those additional runtime cases. Product-specific database,
+authentication, billing, analytics, and Wear additions remain intentionally outside the
+starter template.
+
 ## TPL-A — Restore trust in the verification gate (P0)
 
 **Observed:** `scripts/check_common_main_purity.sh` combined `grep -E` and `-P`, hid

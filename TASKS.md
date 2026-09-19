@@ -4,6 +4,13 @@ Review date: 2026-09-17. This file tracks the requested implementation, not task
 other applications. Detailed future migration tasks are in each project's
 `docs/MODERNIZATION_PLAN.md` and the workspace `../MODERNIZATION.md` index.
 
+## Current migration status — 2026-09-19
+
+Implementation and available Android validation are complete. The physical API 28 device
+passed the three instrumentation cases; the remaining Android matrix and the full Apple
+acceptance path remain external validation. No product-specific backlog is marked complete
+by this migration update.
+
 | ID | Status | Work and acceptance |
 |---|---|---|
 | TPL-001 | done | Inventory baseline, preserve local edits, run original host tests before changes |
@@ -18,8 +25,8 @@ other applications. Detailed future migration tasks are in each project's
 | TPL-010 | done | Generator validates identities, excludes machine files and renames sources; Python tests |
 | TPL-011 | done | English/Hebrew resource parity, manifest/XML checks and module boundary guardrails |
 | TPL-012 | done | Host/unit/APK tests, lint, release shrinking pass; renamed-project (`SmokeApp`) smoke build passes `scripts/verify.sh` end-to-end |
-| TPL-013 | external validation | Run instrumentation on API 26/35/37, real process-death/tablet/IME checks; no device currently attached |
-| TPL-014 | external validation | Run macOS framework tests, Swift host build and iOS simulator journey; local host is ARM64 Linux |
+| TPL-013 | partial / external validation | Physical Samsung SM-G950F API 28 instrumentation passed recreation, safe bounds, and rotation/query restoration. API 26/35/37 matrix plus process-death/tablet/IME/font-scale/RTL/split-screen/predictive-back checks remain. |
+| TPL-014 | external validation | Run macOS framework tests, Swift host build and iOS simulator journey on the MacBook Air M2; not executable on the current Linux host. |
 | TPL-015 | done | Fixed a missing `onClose` import build bug found while running the gate; final code review pass; `docs/VALIDATION.md` records executed vs. external-validation evidence |
 | TPL-016 | done | Language stack in `core:designsystem/i18n`: English/Hebrew/Russian/French by default; one `LocaleManager` and one picker as the only way to change it; the layered Android fix that stops the platform resetting the app to the device language (Application context override, API 33+ per-app locale, config-change/resume re-assert, composition drift heal); `values-he` → `values-iw` build-time mirror so Hebrew resolves on API ≤ 33. `AppLocaleTest` (11 tests) plus a required-locale check in `scripts/check_project.py`; rationale in `docs/LOCALIZATION.md`. **iOS actuals are written but unexecuted** (ARM64 Linux host) and carry a documented CMP 1.11.1 limitation |
 

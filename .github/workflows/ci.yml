@@ -38,6 +38,13 @@ jobs:
           path: |
             **/build/reports/**
             **/build/test-results/**
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: android-release-artifacts
+          path: |
+            androidApp/build/outputs/apk/release/*
+            androidApp/build/outputs/mapping/release/**
   device:
     runs-on: ubuntu-latest
     strategy:
@@ -85,3 +92,10 @@ jobs:
         run: ./gradlew -Pkmptemplate.enableIos=true :sharedApp:linkDebugFrameworkIosSimulatorArm64 :core:common:iosSimulatorArm64Test :feature:example:iosSimulatorArm64Test
       - name: Build Swift host for simulator
         run: xcodebuild -project iosApp/KMPTemplate.xcodeproj -scheme KMPTemplate -sdk iphonesimulator -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: apple-framework-and-host
+          path: |
+            sharedApp/build/bin/iosSimulatorArm64/debugFramework/**
+            iosApp/build/**

@@ -5,6 +5,23 @@ Evidence gathered on this ARM64 Linux host, JDK 21, Android SDK platform 37, on
 script claims. See `TESTING.md` for the full required matrix and `TASKS.md` for
 task status.
 
+## Clean-branch reconciliation, 2026-09-18
+
+The template was rechecked from a clean branch created from `main` at commit
+`8f9fd6e`. The original checkout was not modified. `android init` completed
+successfully, `./gradlew --version` confirmed Gradle 9.6.1 on JDK 21, and the
+dependency-free project checker plus its nine Python regression tests passed.
+
+The Gradle verification gate could not start on this clean clone because the
+execution environment did not expose an Android SDK (`ANDROID_HOME` and
+`ANDROID_SDK_ROOT` were unset and no `local.properties` was present). Gradle
+stopped with the expected SDK-location error while resolving
+`:sharedApp:testAndroidHostTest`; this is an environment prerequisite failure,
+not a source or test assertion failure. Re-run `./scripts/verify.sh` after
+copying `local.properties.example` to `local.properties` and setting `sdk.dir`
+to an installed SDK 37 path. No Android device or macOS/M2 host was available,
+so TPL-013 and TPL-014 remain external validation tasks.
+
 ## Executed and passing
 
 | Check | Command | Result |
@@ -65,6 +82,11 @@ Two real bugs were found and fixed while running the original gate, not by sourc
 
 ## Not executed here (explicitly external validation)
 
+The CI workflow retains the shrunk Android release APK/mapping outputs and
+the macOS framework/host build outputs as review artifacts when those lanes
+pass. Artifact retention makes the platform acceptance evidence inspectable
+without copying build output into the repository.
+
 - **TPL-013 — Android instrumentation on real hardware/emulators (API 26/35/37):** no
   device or emulator is attached to this host. `assembleDebugAndroidTest` compiling is
   evidence of compilation only, not of `connectedDebugAndroidTest` passing. Real phone
@@ -79,3 +101,12 @@ Two real bugs were found and fixed while running the original gate, not by sourc
 Do not infer either of the above passed from a green Gradle build, a compiled test APK,
 or a workflow YAML file existing. They require the stated hardware/OS and are separate
 acceptance gates from this report.
+
+## Physical device validation (2026-09-19)
+
+Using Android SDK `/home/mobihen87/data/develop/sdk/sdk` and USB device `ce031713c28ccc130d` (Samsung SM-G950F, API 28):
+
+- `:androidApp:assembleDebug` passed.
+- `:androidApp:connectedDebugAndroidTest` produced the debug and test APKs.
+- Direct instrumentation run passed all 3 tests (`RestorationTest`): activity recreation state restoration, safe-drawing-area layout, and phone rotation query preservation.
+- The debug APK launched successfully on the physical device.

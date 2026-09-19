@@ -101,3 +101,12 @@ without copying build output into the repository.
 Do not infer either of the above passed from a green Gradle build, a compiled test APK,
 or a workflow YAML file existing. They require the stated hardware/OS and are separate
 acceptance gates from this report.
+
+## Physical device validation (2026-09-19)
+
+Using Android SDK `/home/mobihen87/data/develop/sdk/sdk` and USB device `ce031713c28ccc130d` (Samsung SM-G950F, API 28):
+
+- `:androidApp:assembleDebug` passed.
+- `:androidApp:connectedDebugAndroidTest` produced the debug and test APKs.
+- Direct instrumentation run passed all 3 tests (`RestorationTest`): activity recreation state restoration, safe-drawing-area layout, and phone rotation query preservation.
+- The debug APK launched successfully on the physical device.

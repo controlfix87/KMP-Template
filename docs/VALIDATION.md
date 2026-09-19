@@ -5,6 +5,23 @@ Evidence gathered on this ARM64 Linux host, JDK 21, Android SDK platform 37, on
 script claims. See `TESTING.md` for the full required matrix and `TASKS.md` for
 task status.
 
+## Clean-branch reconciliation, 2026-09-18
+
+The template was rechecked from a clean branch created from `main` at commit
+`8f9fd6e`. The original checkout was not modified. `android init` completed
+successfully, `./gradlew --version` confirmed Gradle 9.6.1 on JDK 21, and the
+dependency-free project checker plus its nine Python regression tests passed.
+
+The Gradle verification gate could not start on this clean clone because the
+execution environment did not expose an Android SDK (`ANDROID_HOME` and
+`ANDROID_SDK_ROOT` were unset and no `local.properties` was present). Gradle
+stopped with the expected SDK-location error while resolving
+`:sharedApp:testAndroidHostTest`; this is an environment prerequisite failure,
+not a source or test assertion failure. Re-run `./scripts/verify.sh` after
+copying `local.properties.example` to `local.properties` and setting `sdk.dir`
+to an installed SDK 37 path. No Android device or macOS/M2 host was available,
+so TPL-013 and TPL-014 remain external validation tasks.
+
 ## Executed and passing
 
 | Check | Command | Result |

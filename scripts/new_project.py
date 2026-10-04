@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DIRECTORIES = ('androidApp', 'core', 'feature', 'sharedApp', 'iosApp', 'build-logic', 'gradle', 'scripts', '.github', 'docs')
-FILES = ('README.md', 'AGENTS.md', 'AGENTS.md', '.gitignore', 'gradlew', 'gradlew.bat', 'gradle.properties', 'settings.gradle.kts', 'build.gradle.kts', 'local.properties.example')
+FILES = ('README.md', 'AGENTS.md', '.gitignore', 'gradlew', 'gradlew.bat', 'gradle.properties', 'settings.gradle.kts', 'build.gradle.kts', 'local.properties.example')
 SKIP = {'.git', '.gradle', '.kotlin', '.idea', 'build', '__pycache__', 'local.properties', 'DerivedData', 'MODERNIZATION_PLAN.md'}
 RESERVED = {'assert', 'boolean', 'byte', 'case', 'char', 'const', 'default', 'double', 'enum', 'extends', 'final', 'finally', 'float', 'goto', 'implements', 'instanceof', 'int', 'long', 'native', 'new', 'private', 'protected', 'public', 'short', 'static', 'strictfp', 'switch', 'synchronized', 'throws', 'transient', 'void', 'volatile', 'class', 'fun', 'object', 'val', 'var', 'when', 'is', 'in', 'as', 'package', 'import', 'return', 'interface', 'null', 'true', 'false', 'this', 'super', 'if', 'else', 'for', 'while', 'do', 'try', 'catch', 'throw', 'break', 'continue', 'typealias', 'typeof'}
 

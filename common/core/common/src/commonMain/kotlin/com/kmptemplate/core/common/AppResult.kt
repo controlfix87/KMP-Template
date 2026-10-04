@@ -55,7 +55,7 @@ val AppResult<*, *>.isSuccess: Boolean get() = this is AppResult.Success
  * Failures reaching or reading data, whether over the network or from local
  * storage. Extend this rather than throwing -- a ViewModel switches
  * exhaustively over these, and the UI layer is the only place that turns one
- * into a localized string (see AGENTS.md's "state classes carry no UI types" rule).
+ * into a localized string (see project rules's "state classes carry no UI types" rule).
  */
 sealed interface DataError : AppError {
     enum class Remote : DataError {

@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  *
  * User-facing strings do NOT live in feature modules -- they're centralised in
  * :common:core:designsystem's composeResources so every locale is one diff to check.
- * See AGENTS.md's localization rule.
+ * See project rules's localization rule.
  */
 class KmpFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {

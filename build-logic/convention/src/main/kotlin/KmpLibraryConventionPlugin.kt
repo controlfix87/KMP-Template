@@ -55,7 +55,7 @@ internal fun KotlinMultiplatformExtension.configureAndroidTarget(project: Projec
         // (testAndroidHostTest / androidHostTest), so everything in commonTest
         // silently never runs on the Android target. The warning it prints
         // without this call is easy to miss in a multi-module build log --
-        // the tests just quietly do not exist. See AGENTS.md's test-task-name
+        // the tests just quietly do not exist. See project rules's test-task-name
         // table before assuming `./gradlew test` covers a KMP module.
         withHostTest {}
 

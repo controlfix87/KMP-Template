@@ -45,6 +45,40 @@ def purity(root):
                 errors.append(f'{path.relative_to(root)}:{line}: platform-only import: {text.strip()}')
     return errors
 
+def layer_imports(root):
+    """Protect co-located domain/data/ui layers without forcing separate modules."""
+    errors = []
+    for path in files(root):
+        if path.suffix != '.kt' or 'commonMain' not in path.parts:
+            continue
+        source = path.read_text()
+        package = re.search(r'^\s*package\s+([\w.]+)', source, re.MULTILINE)
+        if not package:
+            continue
+        owner = re.search(r'\.feature\.([^.]+)\.(domain|data|ui)(?:\.|$)', package.group(1))
+        pure = re.search(r'\.core\.(model|common)(?:\.|$)', package.group(1))
+        for line, text in enumerate(source.splitlines(), 1):
+            imported = re.match(r'\s*import\s+([\w.]+)', text)
+            if not imported:
+                continue
+            target = imported.group(1)
+            framework = target.startswith(('androidx.', 'org.koin.', 'io.ktor.', 'platform.'))
+            target_feature = re.search(r'\.feature\.([^.]+)\.([^.]+)', target)
+            target_layer = re.search(r'\.feature\.[^.]+\.(data|ui|di|navigation)(?:\.|$)', target)
+            if owner:
+                layer = owner.group(2)
+                wrong_feature = target_feature and target_feature.group(1) != owner.group(1)
+                wrong_layer = target_layer and (
+                    layer == 'domain' or
+                    (layer == 'data' and target_layer.group(1) in {'ui', 'di', 'navigation'}) or
+                    (layer == 'ui' and target_layer.group(1) in {'data', 'di'}))
+                infrastructure = re.search(r'\.core\.(designsystem|network)(?:\.|$)', target)
+                if wrong_feature or wrong_layer or (layer == 'domain' and (framework or infrastructure)):
+                    errors.append(f'{path.relative_to(root)}:{line}: forbidden {layer} import: {target}')
+            elif pure and (framework or re.search(r'\.(feature|designsystem|network)\.', target)):
+                errors.append(f'{path.relative_to(root)}:{line}: pure core imports outer layer: {target}')
+    return errors
+
 def check(root, only=False):
     errors = purity(root)
     if only:
@@ -74,15 +108,28 @@ def check(root, only=False):
             ET.parse(path)
         if path.name == 'build.gradle.kts':
             module = path.parent.relative_to(root).parts
+            if module and module[0] == 'common':
+                module = module[1:]
             source = path.read_text()
-            dependencies = re.findall(r'project\("(:[^"\n]+)"\)', source)
-            dependencies += [':' + item.replace('.', ':') for item in re.findall(r'projects\.((?:core|feature)\.[a-zA-Z0-9_.]+)', source)]
+            dependencies = re.findall(r'project\(\s*["\'](:[^"\'\n]+)["\']\s*\)', source)
+            dependencies += [':' + item.replace('.', ':') for item in re.findall(
+                r'projects\.((?:common\.)?(?:core|feature|sharedApp|androidApp)(?:\.[a-zA-Z0-9_]+)*)', source)]
             for dependency in dependencies:
                 parts = dependency.strip(':').split(':')
+                if parts[0] == 'common':
+                    parts = parts[1:]
+                if not parts:
+                    continue
                 if module and module[0] == 'core' and parts[0] in {'feature', 'androidApp', 'sharedApp'}:
                     errors.append(f'{path}: core cannot depend on {dependency}')
-                if module and module[0] == 'feature' and parts[0] == 'feature' and len(module) > 1 and module[1] != parts[1]:
-                    errors.append(f'{path}: cross-feature dependency {dependency}')
+                if len(module) > 1 and module[0] == 'core' and module[1] in {'model', 'common'} and len(parts) > 1 and parts[0] == 'core' and parts[1] in {'network', 'designsystem'}:
+                    errors.append(f'{path}: pure core cannot depend on {dependency}')
+                if module and module[0] == 'feature':
+                    if parts[0] in {'androidApp', 'sharedApp'}:
+                        errors.append(f'{path}: feature cannot depend on {dependency}')
+                    if parts[0] == 'feature' and len(module) > 1 and len(parts) > 1 and module[1] != parts[1]:
+                        errors.append(f'{path}: cross-feature dependency {dependency}')
+    errors.extend(layer_imports(root))
     manifest = root / 'androidApp/src/main/AndroidManifest.xml'
     for node in ET.parse(manifest).iter():
         for key, value in node.attrib.items():

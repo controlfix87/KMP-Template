@@ -57,10 +57,73 @@ class TemplateToolsTest(unittest.TestCase):
             self.assertFalse((result / 'local.properties').exists())
             self.assertFalse((result / '.git').exists())
             self.assertFalse((result / 'androidApp/build').exists())
+            self.assertTrue((result / 'AGENTS.md').is_file())
+            self.assertTrue((result / 'docs/ALIGNMENT_HANDOFF.md').is_file())
+            self.assertFalse((result / 'docs/TEMPLATE_AUDIT.md').exists())
+            self.assertFalse((result / 'docs/plans').exists())
             self.assertIn('org.example.notes.app', (result / 'androidApp/build.gradle.kts').read_text())
             self.assertEqual([], load('check_project').check(result))
             with self.assertRaises(ValueError):
                 module.create(result, 'TestNotes', 'org.example.notes')
+
+    def test_generator_keeps_shared_modules_and_apple_paths(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = load('new_project').create(Path(temp) / 'app', 'TestNotes', 'org.example.notes')
+            for module in ('core/model', 'core/common', 'core/designsystem', 'core/network', 'feature/example', 'sharedApp'):
+                self.assertTrue((root / 'common' / module / 'build.gradle.kts').is_file())
+            self.assertTrue((root / 'common/feature/example/src/commonMain/kotlin/org/example/notes/feature/example/domain/ExampleRepository.kt').is_file())
+            workflow = (root / '.github/workflows/ci.yml').read_text()
+            self.assertIn(':common:sharedApp:linkDebugFrameworkIosSimulatorArm64', workflow)
+            self.assertIn('common/sharedApp/build/bin/', workflow)
+            self.assertIn('-derivedDataPath iosApp/build', workflow)
+            self.assertIn(':common:sharedApp:embedAndSignAppleFrameworkForXcode', (root / 'iosApp/project.yml').read_text())
+
+    def test_nested_module_boundaries_for_direct_and_type_safe_dependencies(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = load('new_project').create(Path(temp) / 'app', 'TestNotes', 'org.example.notes')
+            checker = load('check_project')
+            cases = (
+                ('core/model', 'implementation(project(":common:feature:example"))', 'core cannot'),
+                ('core/model', 'implementation(projects.common.feature.example)', 'core cannot'),
+                ('core/model', 'implementation(projects.common.sharedApp)', 'core cannot'),
+                ('core/model', 'implementation(projects.common.core.network)', 'pure core cannot'),
+                ('core/common', 'implementation(project(":common:core:designsystem"))', 'pure core cannot'),
+                ('feature/example', 'implementation(project(":common:feature:other"))', 'cross-feature'),
+                ('feature/example', 'implementation(projects.common.feature.other)', 'cross-feature'),
+                ('feature/example', 'implementation(projects.common.sharedApp)', 'feature cannot'),
+            )
+            for module, dependency, message in cases:
+                with self.subTest(dependency=dependency):
+                    path = root / 'common' / module / 'build.gradle.kts'
+                    original = path.read_text()
+                    path.write_text(original + '\n' + dependency)
+                    self.assertTrue(any(message in error for error in checker.check(root)))
+                    path.write_text(original)
+            self.assertEqual([], checker.check(root))
+
+    def test_domain_data_ui_and_pure_core_import_direction(self):
+        checker = load('check_project')
+        cases = (
+            ('feature.example.domain', 'io.ktor.client.HttpClient'),
+            ('feature.example.domain', 'org.koin.core.Koin'),
+            ('feature.example.domain', 'com.acme.core.designsystem.Theme'),
+            ('feature.example.domain', 'com.acme.core.network.HttpClientFactory'),
+            ('feature.example.domain', 'com.acme.feature.example.data.RepositoryImpl'),
+            ('feature.example.data', 'com.acme.feature.example.ui.ExampleState'),
+            ('feature.example.ui', 'com.acme.feature.example.data.RepositoryImpl'),
+            ('feature.example.ui', 'com.acme.feature.other.domain.OtherRepository'),
+            ('core.model', 'com.acme.core.network.HttpClientFactory'),
+        )
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = root / 'common/feature/example/src/commonMain/kotlin/Subject.kt'
+            path.parent.mkdir(parents=True)
+            for package, target in cases:
+                with self.subTest(package=package, target=target):
+                    path.write_text(f'package com.acme.{package}\nimport {target}\n')
+                    self.assertEqual(1, len(checker.layer_imports(root)))
+            path.write_text('package com.acme.feature.example.ui\nimport com.acme.feature.example.domain.ExampleRepository\nimport org.vendor.data.PublicApi\n')
+            self.assertEqual([], checker.layer_imports(root))
 
     def test_generator_rejects_unsafe_names(self):
         module = load('new_project')

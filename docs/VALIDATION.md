@@ -110,3 +110,15 @@ Using Android SDK `/home/mobihen87/data/develop/sdk/sdk` and USB device `ce03171
 - `:androidApp:connectedDebugAndroidTest` produced the debug and test APKs.
 - Direct instrumentation run passed all 3 tests (`RestorationTest`): activity recreation state restoration, safe-drawing-area layout, and phone rotation query preservation.
 - The debug APK launched successfully on the physical device.
+
+## Architecture/infrastructure audit, 2026-10-10
+
+A fresh isolated branch re-ran the template Android verification gate after correcting
+shared-directory generation, architectural guards and Apple CI paths. Static checks,
+12 Python regression tests, 23 JUnit tests, lint and debug/instrumentation APK assembly
+passed. The debug APK 16 KB/ZIP check inspected two native libraries and passed.
+
+See [the dated audit report](TEMPLATE_AUDIT.md) for commands, report paths, renamed-copy
+verification and the [portfolio alignment handoff](ALIGNMENT_HANDOFF.md) for adoption.
+This audit did not run release builds, connected runtime tests, macOS/Xcode or hosted CI.
+Earlier dated runtime evidence above remains historical, not proof of this branch.

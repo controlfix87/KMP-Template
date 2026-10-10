@@ -43,12 +43,12 @@ no database plugin or schema is imposed on a new app before it needs persistence
 
 | Module | Responsibility |
 |---|---|
-| `core:model` | Pure shared domain models, JVM + optional iOS |
-| `core:common` | Typed results/errors, coroutine dispatcher abstraction |
-| `core:designsystem` | Shared theme, the language stack (`i18n/`) and English/Hebrew/Russian/French resources |
-| `core:network` | HTTPS Ktor client, timeouts, redacted optional logging, OkHttp/Darwin engines |
-| `feature:example` | Repository seam, offline demo, tested HTTP adapter, MVI list/search and detail entries |
-| `sharedApp` | Shared navigation, serializable keys and production Koin module list; iOS framework |
+| `common:core:model` | Pure shared domain models, JVM + optional iOS |
+| `common:core:common` | Typed results/errors, coroutine dispatcher abstraction |
+| `common:core:designsystem` | Shared theme, the language stack (`i18n/`) and English/Hebrew/Russian/French resources |
+| `common:core:network` | HTTPS Ktor client, timeouts, redacted optional logging, OkHttp/Darwin engines |
+| `common:feature:example` | Repository seam, offline demo, tested HTTP adapter, MVI list/search and detail entries |
+| `common:sharedApp` | Shared navigation, serializable keys and production Koin module list; iOS framework |
 | `androidApp` | Android Application/Activity, edge-to-edge, Android/device tests |
 | `iosApp` | SwiftUI host and reproducible XcodeGen specification |
 | `build-logic:convention` | Pure, platform-library, Compose and feature plugins |
@@ -113,7 +113,7 @@ because Android reports Hebrew as `iw` up to API 33 and as `he` from 34.
 `verify.sh` runs static checks, Python generator/checker tests, pure common tests, KMP
 Android host tests, Android app unit tests, lint and both app/test APK compilation.
 Do not substitute a bare `./gradlew test`: different module types expose different tasks.
-`core:model` has no behavior tests because it currently contains only a data class.
+`common:core:model` has no behavior tests because it currently contains only a data class.
 
 CI adds APIs 26/35/37 device lanes, a renamed-project build, release shrinking, and a
 macOS shared-framework/Swift-host lane. Workflow definitions are provided; see
@@ -140,7 +140,7 @@ Linux compilation results are not evidence of an iOS build.
 2. Put framework-independent contracts/models in domain; implement transport/persistence in data.
 3. Add State/Action/ViewModel and stateless Screen/Root. Save scalar IDs/drafts, not whole models.
 4. Expose Nav3 entries and serializable keys; use callbacks for cross-feature navigation.
-5. Register key serializers and the feature's module in `common/sharedApp/App.kt`. The DI test
+5. Register key serializers and the feature's module in `common/sharedApp/src/commonMain/kotlin/com/kmptemplate/app/App.kt`. The DI test
    consumes that exact production module list; extend its resolution assertions for new roots.
 6. Add fake-backed tests and relevant restoration/device cases in the same change.
 7. Remove the example include/dependency/module/routes/serializers/tests only after the real
@@ -167,4 +167,4 @@ macOS. Debug builds run without credentials; release output is unsigned until a
 product supplies its signing configuration.
 
 See [implementation tasks](TASKS.md), [testing](docs/TESTING.md),
-[validation](docs/VALIDATION.md), and the workspace [project plans](../MODERNIZATION.md).
+[validation](docs/VALIDATION.md), and the [portfolio alignment handoff](docs/ALIGNMENT_HANDOFF.md).

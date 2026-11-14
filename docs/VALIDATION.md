@@ -110,3 +110,18 @@ Using Android SDK `/home/mobihen87/data/develop/sdk/sdk` and USB device `ce03171
 - `:androidApp:connectedDebugAndroidTest` produced the debug and test APKs.
 - Direct instrumentation run passed all 3 tests (`RestorationTest`): activity recreation state restoration, safe-drawing-area layout, and phone rotation query preservation.
 - The debug APK launched successfully on the physical device.
+
+## CMPTemplate update — 2026-11-14 (commits b3a21cc..a473384)
+
+Executed on the Mac build lane (macOS, JDK 21, iOS targets on), commit b17fc22, one combined run:
+`:common:core:model:allTests :common:core:common:allTests testAndroidHostTest desktopTest
+:androidApp:recordRoborazziDebug :androidApp:lintDebug :androidApp:assembleDebug
+:androidApp:assembleDebugAndroidTest :desktopApp:recordRoborazziDesktop
+:common:sharedApp:linkDebugFrameworkIosSimulatorArm64` — **BUILD SUCCESSFUL**. Static checks and
+the 12 Python generator/checker tests pass on Linux. 12 Android (Robolectric) and 3 desktop
+screenshots were recorded and reviewed; the review found an unreadable label on the report screen,
+fixed in a473384 and re-recorded.
+
+Not executed: device instrumentation (`connectedDebugAndroidTest`), the iOS simulator app run,
+a Gradle build of a generated project (CI defines it), and a live report to reports.controlfix.net
+(the sender is covered by MockEngine tests only).

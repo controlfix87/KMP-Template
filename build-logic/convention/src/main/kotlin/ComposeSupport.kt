@@ -3,10 +3,10 @@ import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 /**
- * Compose Multiplatform UI wiring shared by [KmpComposeConventionPlugin] and
- * [KmpFeatureConventionPlugin]. Kept separate because :common:core:designsystem needs
+ * Compose Multiplatform UI wiring shared by [CmpComposeConventionPlugin] and
+ * [CmpFeatureConventionPlugin]. Kept separate because :common:core:designsystem needs
  * the Compose setup but must NOT pick up the feature-only project deps the way
- * [KmpFeatureConventionPlugin] adds for every actual feature.
+ * [CmpFeatureConventionPlugin] adds for every actual feature.
  */
 internal fun Project.applyComposePlugins() {
     pluginManager.apply("org.jetbrains.kotlin.multiplatform")

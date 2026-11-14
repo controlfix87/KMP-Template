@@ -91,5 +91,48 @@ class TemplateToolsTest(unittest.TestCase):
     def test_generator_supports_package_nested_under_template_package(self):
         module = load('new_project')
         with tempfile.TemporaryDirectory() as temp:
-            result = module.create(Path(temp) / 'app', 'NestedNotes', 'com.kmptemplate.notes')
-            self.assertTrue((result / 'androidApp/src/main/kotlin/com/kmptemplate/notes/app/NestedNotesApplication.kt').exists())
+            result = module.create(Path(temp) / 'app', 'NestedNotes', 'com.cmptemplate.notes')
+            self.assertTrue((result / 'androidApp/src/main/kotlin/com/cmptemplate/notes/app/NestedNotesApplication.kt').exists())
+
+    def test_generator_copies_the_shared_modules_under_common(self):
+        # Regression: the allowlist once named core/feature/sharedApp at the root, so generated
+        # projects had no shared module at all.
+        with tempfile.TemporaryDirectory() as temp:
+            result = load('new_project').create(Path(temp) / 'app', 'TestNotes', 'org.example.notes')
+            for module in ('common/core/designsystem', 'common/feature/about', 'common/feature/onboarding', 'common/sharedApp', 'desktopApp'):
+                self.assertTrue((result / module / 'build.gradle.kts').exists(), module)
+            app = (result / 'common/sharedApp/src/commonMain/kotlin/org/example/notes/app/App.kt').read_text()
+            self.assertIn('OnboardingRoute', app)
+            self.assertNotIn('cmptemplate', app.lower())
+
+    def test_generator_without_onboarding_removes_module_and_wiring(self):
+        with tempfile.TemporaryDirectory() as temp:
+            result = load('new_project').create(Path(temp) / 'app', 'TestNotes', 'org.example.notes', onboarding=False)
+            self.assertFalse((result / 'common/feature/onboarding').exists())
+            for path in result.rglob('*.kt*'):
+                text = path.read_text()
+                self.assertNotIn('feature.onboarding', text, path)
+                self.assertNotIn('[onboarding]', text, path)
+                self.assertNotIn(':common:feature:onboarding', text, path)
+            app = (result / 'common/sharedApp/src/commonMain/kotlin/org/example/notes/app/App.kt').read_text()
+            self.assertIn('val start = Home', app)
+            self.assertIn('onRunSetupAgain = null,', app)
+            self.assertEqual([], load('check_project').check(result))
+
+    def test_feature_cannot_depend_on_another_feature_under_common(self):
+        module = load('check_project')
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            base = root / 'common/core/designsystem/src/commonMain/composeResources'
+            for folder in ('values', *(f'values-{code}' for code in module.REQUIRED_LOCALES)):
+                (base / folder).mkdir(parents=True)
+                (base / folder / 'strings.xml').write_text('<resources><string name="a">x</string></resources>')
+            (root / 'androidApp/src/main').mkdir(parents=True)
+            (root / 'androidApp/src/main/AndroidManifest.xml').write_text('<manifest><application /></manifest>')
+            feature = root / 'common/feature/one/build.gradle.kts'
+            feature.parent.mkdir(parents=True)
+            feature.write_text('dependencies { implementation(project(":common:feature:two")) }')
+            core = root / 'common/core/model/build.gradle.kts'
+            core.parent.mkdir(parents=True)
+            core.write_text('dependencies { implementation(projects.common.feature.one) }')
+            self.assertEqual(2, len(module.check(root)))

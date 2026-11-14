@@ -1,19 +1,25 @@
-name: KMPTemplate
+name: CMPTemplate
 options:
-  bundleIdPrefix: com.kmptemplate
+  bundleIdPrefix: com.cmptemplate
   deploymentTarget:
     iOS: '15.0'
 settings:
   base:
     SWIFT_VERSION: '5.0'
 targets:
-  KMPTemplate:
+  CMPTemplate:
     type: application
     platform: iOS
     sources: [Sources]
+    info:
+      path: Sources/Info.plist
+      properties:
+        # Required by Compose Multiplatform for 120 Hz ProMotion (GameController); without it iOS logs
+        # a warning and caps animations at 60 Hz.
+        CADisableMinimumFrameDurationOnPhone: true
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.kmptemplate.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.cmptemplate.app
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
@@ -25,10 +31,10 @@ targets:
       - name: Build Kotlin framework
         script: |
           cd "$SRCROOT/.."
-          ./gradlew -Pkmptemplate.enableIos=true :common:sharedApp:embedAndSignAppleFrameworkForXcode
+          ./gradlew -Pcmptemplate.enableIos=true :common:sharedApp:embedAndSignAppleFrameworkForXcode
         basedOnDependencyAnalysis: false
 schemes:
-  KMPTemplate:
+  CMPTemplate:
     build:
       targets:
-        KMPTemplate: all
+        CMPTemplate: all

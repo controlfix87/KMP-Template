@@ -1,8 +1,12 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.kotlin.serialization)
+    // Screenshot tests: shared screens drawn on the JVM (Robolectric), no phone needed.
+    alias(libs.plugins.roborazzi)
 }
 
 // AGP 9 compiles Kotlin itself for a com.android.application module -- do NOT
@@ -11,11 +15,11 @@ plugins {
 // support since AGP 9.0").
 
 android {
-    namespace = "com.kmptemplate.app"
+    namespace = "com.cmptemplate.app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.kmptemplate.app"
+        applicationId = "com.cmptemplate.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -23,6 +27,19 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
 
+    }
+
+    // Release key (ControlFix convention): a keystore.properties (storeFile, storePassword, keyAlias,
+    // keyPassword) kept in the private assets repo, located through the Gradle property
+    // controlfix.signing.cmptemplate in ~/.gradle/gradle.properties of the build machine. Never commit
+    // a key or password here. Without it the release build is unsigned.
+    val signing = (findProperty("controlfix.signing.cmptemplate") as String?)?.let(::File)?.takeIf { it.isFile }
+    if (signing != null) signingConfigs.create("release") {
+        val p = Properties().apply { signing.inputStream().use { load(it) } }
+        storeFile = File(signing.parentFile, p.getProperty("storeFile"))
+        storePassword = p.getProperty("storePassword")
+        keyAlias = p.getProperty("keyAlias")
+        keyPassword = p.getProperty("keyPassword")
     }
 
     buildFeatures {
@@ -37,6 +54,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfigs.findByName("release")?.let { signingConfig = it }
         }
         debug {
             applicationIdSuffix = ".debug"
@@ -67,6 +85,8 @@ dependencies {
     implementation(project(":common:core:designsystem"))
     implementation(project(":common:core:network"))
     implementation(project(":common:feature:example"))
+    implementation(project(":common:feature:about"))
+    implementation(project(":common:feature:onboarding")) // [onboarding]
 
     implementation(compose.runtime)
     implementation(compose.foundation)
@@ -95,6 +115,13 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.koin.test)
     testImplementation(libs.mockk)
+    // Roborazzi + Robolectric screenshot tests (JUnit 4, run through the vintage engine).
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.androidx.compose.ui.test)
+    testImplementation(libs.androidx.test.junit)
+    testImplementation(libs.junit4)
+    testRuntimeOnly(libs.junit5.vintage.engine)
 
     androidTestImplementation(libs.androidx.compose.ui.test)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

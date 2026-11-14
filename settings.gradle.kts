@@ -1,4 +1,4 @@
-rootProject.name = "KMPTemplate"
+rootProject.name = "CMPTemplate"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
@@ -29,7 +29,10 @@ include(":common:core:network")       // Ktor HttpClient factory + base API plum
 // One feature module per screen/flow. Never depend on another :common:feature:*
 // module directly -- shared code moves into :core instead.
 include(":common:feature:example")
+include(":common:feature:about")       // ControlFix About + report/suggestion screen (reports.controlfix.net)
+include(":common:feature:onboarding")  // [onboarding] optional first-run setup
 
 // ---- app ------------------------------------------------------------------
 include(":androidApp")
 include(":common:sharedApp")
+include(":desktopApp")                 // Compose Desktop host (JVM) + desktop Roborazzi screenshots

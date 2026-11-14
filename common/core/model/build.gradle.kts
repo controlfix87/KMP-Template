@@ -1,3 +1,3 @@
 plugins {
-    alias(libs.plugins.kmptemplate.kmp.pure)
+    alias(libs.plugins.cmptemplate.kmp.pure)
 }

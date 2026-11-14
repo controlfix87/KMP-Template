@@ -29,6 +29,12 @@ by this migration update.
 | TPL-014 | external validation | Run macOS framework tests, Swift host build and iOS simulator journey on the MacBook Air M2; not executable on the current Linux host. |
 | TPL-015 | done | Fixed a missing `onClose` import build bug found while running the gate; final code review pass; `docs/VALIDATION.md` records executed vs. external-validation evidence |
 | TPL-016 | done | Language stack in `core:designsystem/i18n`: English/Hebrew/Russian/French by default; one `LocaleManager` and one picker as the only way to change it; the layered Android fix that stops the platform resetting the app to the device language (Application context override, API 33+ per-app locale, config-change/resume re-assert, composition drift heal); `values-he` → `values-iw` build-time mirror so Hebrew resolves on API ≤ 33. `AppLocaleTest` (11 tests) plus a required-locale check in `scripts/check_project.py`; rationale in `docs/LOCALIZATION.md`. **iOS actuals are written but unexecuted** (ARM64 Linux host) and carry a documented CMP 1.11.1 limitation |
+| TPL-017 | done (source) / validation pending | Compose Multiplatform template renamed to **CMPTemplate** (packages, plugin ids `cmptemplate.kmp.*` / `cmptemplate.cmp.*`, generator, docs); desktop (JVM) target in every library/UI module and a `desktopApp` host |
+| TPL-018 | done (source) / validation pending | Roborazzi screenshot tests: Android (Robolectric, phone + Fold) and desktop |
+| TPL-019 | done (source) / validation pending | ControlFix branding (palette, Exo 2, mark, wordmark), light/dark/system theme with bar icons following the app theme, shared components |
+| TPL-020 | done (source) / validation pending | `feature:about`: branded About and report/suggestion screen to reports.controlfix.net, e-mail fallback to support@controlfix.net, redaction, crash recorder (Android/desktop), tests |
+| TPL-021 | done (source) / validation pending | Optional `feature:onboarding` (language + theme cards, step bar, skip, saved step, run again); `--without-onboarding` generator flag |
+| TPL-022 | done (source) / validation pending | Generator `common/` allowlist and boundary-checker fixes (T0021 note), `docs/INSIGHTS.md` |
 
 ## Completion policy
 

@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.kmptemplate.kmp.feature)
+    alias(libs.plugins.cmptemplate.cmp.feature)
 }
 
 kotlin {

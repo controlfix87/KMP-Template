@@ -15,12 +15,18 @@ internal fun VersionCatalog.bundle(alias: String) = findBundle(alias).get()
 
 /** Enable Apple targets by default on macOS; Linux ARM64 cannot link Apple frameworks. */
 internal val Project.iosEnabled: Boolean
-    get() = providers.gradleProperty("kmptemplate.enableIos").orNull?.toBoolean() ?: (System.getProperty("os.name") == "Mac OS X")
+    get() = providers.gradleProperty("cmptemplate.enableIos").orNull?.toBoolean() ?: (System.getProperty("os.name") == "Mac OS X")
 
 /** Reverse-DNS namespace derived from the module path, keeping `common` as a filesystem boundary rather than a package. */
 internal val Project.moduleNamespace: String
-    get() = "com.kmptemplate." + path
+    get() = "com.cmptemplate." + path
         .removePrefix(":common:")
         .removePrefix(":")
         .replace(":", ".")
         .replace("-", "")
+
+/**
+ * Name of the desktop (JVM) target in every UI and library module. Its source sets are
+ * `desktopMain`/`desktopTest`; the `:desktopApp` host runs it and takes the desktop Roborazzi shots.
+ */
+internal const val DESKTOP_TARGET = "desktop"

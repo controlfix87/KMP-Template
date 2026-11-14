@@ -17,6 +17,10 @@ empty tests just to increase counts.
 | HTTP adapter | same feature task | Base-path joining, statuses, malformed JSON, cancellation, HTTPS validation |
 | DI | `:androidApp:testDebugUnitTest` | Real module list resolves repository and entry ViewModel |
 | Device | `:androidApp:connectedDebugAndroidTest` | Query/detail restoration, real phone rotation, safe drawing bounds |
+| Report sender | `:common:feature:about:testAndroidHostTest` / `desktopTest` | Contract body + `x-report-app`, redacted log/crash, crash cleared after send, 429/4xx/5xx/offline mapping, cancellation |
+| Report / onboarding ViewModels | same, and `:common:feature:onboarding:desktopTest` | Send gating, crash notice, single send, e-mail fallback, saved draft/step, skip/finish/reset |
+| Screenshots (Android) | `:androidApp:recordRoborazziDebug` (save) / `verifyRoborazziDebug` (compare) | Home, onboarding steps (also Hebrew light, Fold), About light/dark/Fold, report crash/failed/sent drawn by Robolectric, in `androidApp/build/outputs/roborazzi/`; no device needed |
+| Screenshots (desktop) | `:desktopApp:recordRoborazziDesktop` / `verifyRoborazziDesktop` | Home, About, onboarding (French) drawn by Compose Desktop, in `desktopApp/build/outputs/roborazzi/` |
 | Generator/checker | `python3 -m unittest discover -s scripts/tests -v` | Reject invalid destination/identity, exclude machine files, detect nested import leaks |
 | Release | `:androidApp:assembleRelease` | R8/resource shrinking and packaging succeed |
 | iOS | macOS CI | Native common tests, framework linkage and Swift host build |
@@ -34,7 +38,7 @@ force all platforms onto a JVM-only JUnit engine.
    go back and check query. This is covered by the device test.
 3. **Saved state:** reconstruct a ViewModel from saved scalar inputs; covered by unit tests.
 4. **Real process death:** on a disposable test device, enter query/detail, press Home,
-   run `adb shell am kill com.kmptemplate.app.debug`, return via Recents, and inspect
+   run `adb shell am kill com.cmptemplate.app.debug`, return via Recents, and inspect
    restored destination/query. Do not use force-stop as an equivalent; force-stop
    changes task/session semantics. Repeat with a new product's form and worker IDs.
 5. **Scroll restoration:** scroll far enough to dispose early rows, enter detail,

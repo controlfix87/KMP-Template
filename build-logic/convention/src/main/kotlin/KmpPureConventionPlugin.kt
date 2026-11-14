@@ -6,8 +6,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 /**
  * Pure-Kotlin multiplatform module: no Android, no Compose.
  *
- * Targets JVM (so a future JVM server or CLI consumes the exact same classes
- * the apps do) plus the Apple targets when opted in. Use this for modules that
+ * Targets JVM (the desktop app, and any future JVM server or CLI, consume the
+ * exact same classes the apps do) plus the Apple targets when opted in. Use this for modules that
  * must stay platform-neutral by construction -- domain models and small shared
  * utilities, the two places you most want a compile error, not a code-review
  * comment, if an `android.*`/`java.time` import sneaks in.

@@ -46,8 +46,8 @@ layout direction**.
 | Layer | Where | What it covers |
 |---|---|---|
 | Platform per-app locale (API 33+) | `AndroidAppLocale.syncSystemPerAppLocale`, driven from `applyLocale`'s `LaunchedEffect(tag)` | The system stamps the language into every Configuration it builds for this app, including the Application's, so the re-derivation in (2) yields the app's language. This is the real fix. |
-| Application base context | `KMPTemplateApplication.attachBaseContext` → `AndroidAppLocale.wrap` | The API 26–32 equivalent: `createConfigurationContext` registers a persistent override in `ResourcesManager`, so the Application's `Resources` keep the language across configuration updates. |
-| Application config changes | `KMPTemplateApplication.onConfigurationChanged` → `patch` | Process-level changes that reach no resumed Activity. |
+| Application base context | `CMPTemplateApplication.attachBaseContext` → `AndroidAppLocale.wrap` | The API 26–32 equivalent: `createConfigurationContext` registers a persistent override in `ResourcesManager`, so the Application's `Resources` keep the language across configuration updates. |
+| Application config changes | `CMPTemplateApplication.onConfigurationChanged` → `patch` | Process-level changes that reach no resumed Activity. |
 | Activity base context + config changes | `MainActivity.attachBaseContext` / `onConfigurationChanged` | `context.resources` strings, date and number formatting, from the first frame. |
 | Activity resume | `MainActivity.onResume` → `reassert` | Anything that reset the process while the Activity was stopped. |
 | Composition | `AppLocaleProvider`'s `repeatOnLifecycle(RESUMED)` drift check | Last line of defence, and the only layer that makes an **already-composed** tree reload its strings rather than drifting screen by screen. |

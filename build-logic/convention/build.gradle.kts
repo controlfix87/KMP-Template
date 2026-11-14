@@ -16,20 +16,20 @@ dependencies {
 gradlePlugin {
     plugins {
         register("kmpPure") {
-            id = "kmptemplate.kmp.pure"
+            id = "cmptemplate.kmp.pure"
             implementationClass = "KmpPureConventionPlugin"
         }
         register("kmpLibrary") {
-            id = "kmptemplate.kmp.library"
+            id = "cmptemplate.kmp.library"
             implementationClass = "KmpLibraryConventionPlugin"
         }
-        register("kmpCompose") {
-            id = "kmptemplate.kmp.compose"
-            implementationClass = "KmpComposeConventionPlugin"
+        register("cmpCompose") {
+            id = "cmptemplate.cmp.compose"
+            implementationClass = "CmpComposeConventionPlugin"
         }
-        register("kmpFeature") {
-            id = "kmptemplate.kmp.feature"
-            implementationClass = "KmpFeatureConventionPlugin"
+        register("cmpFeature") {
+            id = "cmptemplate.cmp.feature"
+            implementationClass = "CmpFeatureConventionPlugin"
         }
     }
 }

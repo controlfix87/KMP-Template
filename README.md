@@ -1,7 +1,10 @@
-# KMPTemplate
+# CMPTemplate
 
-Android + iOS Kotlin Multiplatform starter with an offline sample, shared Compose UI,
-Navigation 3, Koin, state restoration, tested networking, and repeatable project generation.
+Compose Multiplatform starter for **Android, iOS and desktop**: one shared Compose UI (screens,
+strings, fonts, icons, theme all in `commonMain`), Navigation 3, Koin, state restoration, tested
+networking, Roborazzi screenshot tests and repeatable project generation. It ships the ControlFix
+branding, an About screen, an in-app report/suggestion screen wired to the ControlFix reports
+service, and an optional first-run onboarding.
 Android compiles and targets **Android 17 / API 37**, with **minSdk 26**.
 
 ## Create a project
@@ -10,6 +13,7 @@ From this template directory:
 
 ```bash
 python3 scripts/new_project.py --name MyNotes --package com.example.mynotes --destination ../MyNotes
+# add --without-onboarding to leave out the first-run setup module
 cd ../MyNotes
 # Set ANDROID_HOME, or create local.properties containing sdk.dir=/your/android/sdk
 ./scripts/verify.sh
@@ -32,7 +36,7 @@ Replace the sample when creating your first real feature; keep its restoration/t
 - Python 3.11+ for project generation/static checks (no Python packages required).
 - macOS with Xcode and XcodeGen for iOS. Apple Silicon targets: device ARM64 and simulator ARM64.
 - Android/Linux builds do not configure Apple targets. macOS enables them automatically;
-  override with `-Pkmptemplate.enableIos=true` or `false`.
+  override with `-Pcmptemplate.enableIos=true` or `false`.
 
 Versions are centralized in `gradle/libs.versions.toml`; this is a tested pinned baseline,
 not a promise that each dependency is the newest available. Navigation 3 uses the
@@ -43,20 +47,64 @@ no database plugin or schema is imposed on a new app before it needs persistence
 
 | Module | Responsibility |
 |---|---|
-| `core:model` | Pure shared domain models, JVM + optional iOS |
-| `core:common` | Typed results/errors, coroutine dispatcher abstraction |
-| `core:designsystem` | Shared theme, the language stack (`i18n/`) and English/Hebrew/Russian/French resources |
-| `core:network` | HTTPS Ktor client, timeouts, redacted optional logging, OkHttp/Darwin engines |
-| `feature:example` | Repository seam, offline demo, tested HTTP adapter, MVI list/search and detail entries |
-| `sharedApp` | Shared navigation, serializable keys and production Koin module list; iOS framework |
-| `androidApp` | Android Application/Activity, edge-to-edge, Android/device tests |
+| `common:core:model` | Pure shared domain models (`AppInfo`, sample item), JVM + optional iOS |
+| `common:core:common` | Typed results/errors, coroutine dispatcher abstraction |
+| `common:core:designsystem` | ControlFix theme (palette, Exo 2), light/dark/system `ThemeManager`, `AppPreferences`, shared components (`ScreenHeader`, `SectionCard`, `OptionCard`, `StepProgress`, `AppMark`, `Wordmark`, `AppIcons`), the language stack (`i18n/`) and English/Hebrew/Russian/French resources |
+| `common:core:network` | HTTPS Ktor client, timeouts, redacted optional logging, OkHttp/Darwin engines |
+| `common:feature:example` | Repository seam, offline demo, tested HTTP adapter, MVI list/search and detail entries |
+| `common:feature:about` | Branded About, report/suggestion screen, `HttpReportSender`, `Redactor`, e-mail fallback, crash recorder + diagnostics per platform |
+| `common:feature:onboarding` | **Optional** first-run setup: language + theme, a product step, done |
+| `common:sharedApp` | Shared navigation, serializable keys and production Koin module list; iOS framework |
+| `androidApp` | Android Application/Activity, edge-to-edge, release signing, Robolectric screenshots, device tests |
+| `desktopApp` | Compose Desktop window (JVM) and desktop screenshots |
 | `iosApp` | SwiftUI host and reproducible XcodeGen specification |
-| `build-logic:convention` | Pure, platform-library, Compose and feature plugins |
+| `build-logic:convention` | `cmptemplate.kmp.pure`, `cmptemplate.kmp.library`, `cmptemplate.cmp.compose`, `cmptemplate.cmp.feature` (Android + desktop + optional iOS targets) |
 
 Feature modules never depend on another feature; share contracts in core modules.
 Keep feature domain/data/ui/di/navigation packages together until separate compilation
 or ownership merits layer modules. Pure modules must not import Android/JVM-specific
 APIs into common source sets. Platform interfaces use expect/actual or injection.
+
+## ControlFix branding
+
+`core:designsystem/Theme.kt` holds the ControlFix palette (lime `#A9F000`, teal `#17B3A4`, navy
+`#101D33` → ink `#070C17`, paper `#E9F2F7`) as a dark navy and a light paper scheme, and Exo 2
+(SIL OFL, `docs/branding/Exo2-OFL.txt`) for headlines, titles and labels; body text stays on the
+platform font. Use `primary` for lime: on light surfaces it is the readable deep lime. The user picks
+light, dark or "follow device" (`ThemeManager`, in onboarding and About); Android's status/navigation
+bar icons follow the *app's* theme, not the device's. `AppMark` is a placeholder mark drawn in code:
+replace it, the Android launcher icon and `about_body` with the product's own.
+
+## About, reports and suggestions
+
+`feature:about` is the About screen (mark, name, version, "Made by ControlFix", website, privacy,
+support e-mail, report a problem, send a suggestion, language, theme, run setup again) and the report
+screen. Reports go to the shared ControlFix reports service on Cloudflare,
+`POST https://reports.controlfix.net/v1/reports` (contract: AgentsHub `tools/reports/README.md`), with
+`x-report-app` = the Android package / iOS bundle id. Tickets land on the Orange Pi under
+`~/data/tickets/<app id>/` (debug builds use the `.debug` id). Device details always go; the redacted
+recent log and last crash only with the "Attach app logs" box (on by default). When the service
+cannot be reached, refuses the report or rate-limits it (10 per hour), the screen offers **Send by
+e-mail instead**: a `mailto:support@controlfix.net` with subject, message and device details. No
+secret is in the app; the endpoint is public by design. `CrashRecorder.install()` runs first in
+`Application.onCreate` (Android) and `main()` (desktop); iOS sends device details only.
+
+Before release: set `ControlFixLinks.PRIVACY` to the product's privacy page and write `about_body`.
+
+## Onboarding (optional)
+
+`feature:onboarding` opens on a fresh install: a numbered, titled step bar (finished steps tappable),
+language and theme first as cards, one template product step (`OnboardingStep.APP`, replace it),
+and a done step. Skip is on every step but the last; the step survives language changes, rotation and
+process death. About offers "Run setup again". Generate without it:
+`scripts/new_project.py ... --without-onboarding` deletes the module and every line marked
+`[onboarding]` (or inside `region onboarding`), and enables the lines marked `// without onboarding`.
+
+## Desktop
+
+`./gradlew :desktopApp:run` opens the shared App in a desktop window. Settings live in
+`java.util.prefs` under `cmptemplate`; crashes in `~/.cmptemplate/diagnostics/`. Packaging:
+`./gradlew :desktopApp:packageDistributionForCurrentOS` (DMG/MSI/DEB).
 
 ## Rotation, resizing and edge-to-edge
 
@@ -111,7 +159,13 @@ because Android reports Hebrew as `iw` up to API 33 and as `he` from 34.
 ```
 
 `verify.sh` runs static checks, Python generator/checker tests, pure common tests, KMP
-Android host tests, Android app unit tests, lint and both app/test APK compilation.
+Android host tests, desktop (JVM) tests, Android app unit and Robolectric screenshot tests, lint,
+app/test APK compilation and the desktop host compilation.
+
+Screenshots (Roborazzi): `./gradlew :androidApp:recordRoborazziDebug` (phone and Fold sizes,
+Robolectric) and `./gradlew :desktopApp:recordRoborazziDesktop` write PNGs to
+`*/build/outputs/roborazzi/`; `verifyRoborazziDebug` / `verifyRoborazziDesktop` compare with the last
+recording. Look at them after every UI change.
 Do not substitute a bare `./gradlew test`: different module types expose different tasks.
 `core:model` has no behavior tests because it currently contains only a data class.
 
@@ -124,10 +178,10 @@ macOS shared-framework/Swift-host lane. Workflow definitions are provided; see
 ```bash
 brew install xcodegen
 ./scripts/ios-project.sh
-open iosApp/KMPTemplate.xcodeproj
+open iosApp/CMPTemplate.xcodeproj
 ```
 
-Choose the KMPTemplate scheme and an Apple Silicon simulator. The Xcode build phase
+Choose the CMPTemplate scheme and an Apple Silicon simulator. The Xcode build phase
 builds/embeds `SharedApp`; no manually copied framework is required. Simulator builds
 need no distribution signing. Set your development team for a physical device.
 The SwiftUI wrapper delegates safe areas to Compose. The project supports both phone
@@ -163,8 +217,10 @@ This workspace uses ARM64 Linux. Android build tools may need an existing host-l
 broken under local emulation, override it locally rather than disabling release
 optimization for everyone. Robolectric native dependencies may be unavailable here;
 use device tests for actual platform behavior. Kotlin/Native framework linking needs
-macOS. Debug builds run without credentials; release output is unsigned until a
-product supplies its signing configuration.
+macOS. Debug builds run without credentials. Release builds sign when the Gradle property
+`controlfix.signing.cmptemplate` (in `~/.gradle/gradle.properties` of the build machine) points to a
+`keystore.properties` in the private assets repo; otherwise they are unsigned. Never commit a key.
 
-See [implementation tasks](TASKS.md), [testing](docs/TESTING.md),
+See [implementation tasks](TASKS.md), [lessons from LockdownControl and GameController](docs/INSIGHTS.md),
+[testing](docs/TESTING.md),
 [validation](docs/VALIDATION.md), and the workspace [project plans](../MODERNIZATION.md).

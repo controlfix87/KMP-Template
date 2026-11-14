@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.KMPTemplate" parent="android:style/Theme.Material.Light.NoActionBar">
+    <style name="Theme.CMPTemplate" parent="android:style/Theme.Material.Light.NoActionBar">
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowActionModeOverlay">true</item>
     </style>

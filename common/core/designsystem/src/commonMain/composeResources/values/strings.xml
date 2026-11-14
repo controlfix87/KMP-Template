@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KMPTemplate</string>
+    <string name="app_name">CMPTemplate</string>
 
     <string name="example_title">Example</string>
     <string name="example_loading">Loading…</string>
@@ -17,4 +17,58 @@
          read needs to see it written the way they write it. -->
     <string name="language">Language</string>
     <string name="language_close">Close</string>
+
+    <!-- Shared screens: theme, onboarding, About, reports. -->
+    <string name="common_back">Back</string>
+    <string name="common_close">Close</string>
+    <string name="theme">Theme</string>
+    <string name="theme_system">Follow device</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="onb_step_of">Step %1$d of %2$d</string>
+    <string name="onb_step_welcome">Welcome</string>
+    <string name="onb_step_app">Setup</string>
+    <string name="onb_step_done">Done</string>
+    <string name="onb_welcome_title">Welcome to %1$s</string>
+    <string name="onb_welcome_body">Pick your language and look. You can change both later in About.</string>
+    <string name="onb_app_title">Make it yours</string>
+    <string name="onb_app_body">Template step: replace it with what this app needs on first run, such as a permission, an account or a first choice. Keep setup short; everything else belongs in Settings.</string>
+    <string name="onb_done_title">All set</string>
+    <string name="onb_done_body">You can run this setup again from About.</string>
+    <string name="onb_back">Back</string>
+    <string name="onb_next">Next</string>
+    <string name="onb_skip">Skip</string>
+    <string name="onb_start">Start</string>
+    <string name="about_title">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_made_by">Made by ControlFix</string>
+    <string name="about_body">Replace this line with what the app does, in one or two sentences.</string>
+    <string name="about_website">Website</string>
+    <string name="about_privacy">Privacy policy</string>
+    <string name="about_feedback">Help and feedback</string>
+    <string name="about_report">Report a problem</string>
+    <string name="about_suggest">Send a suggestion</string>
+    <string name="about_support">E-mail %1$s</string>
+    <string name="about_settings">Settings</string>
+    <string name="about_run_setup">Run setup again</string>
+    <string name="report_title">Report or suggestion</string>
+    <string name="report_body">Goes straight to the developer, with your device details.</string>
+    <string name="report_kind_crash">Crash</string>
+    <string name="report_kind_bug">Problem</string>
+    <string name="report_kind_suggestion">Suggestion</string>
+    <string name="report_field_title">Title</string>
+    <string name="report_field_message">What happened, or what you would like</string>
+    <string name="report_field_contact">E-mail for a reply (optional)</string>
+    <string name="report_logs">Attach app logs</string>
+    <string name="report_logs_hint">The app’s recent log and last crash. Tokens, e-mail and network addresses are removed first.</string>
+    <string name="report_crash_attached">The app closed unexpectedly on %1$s; its details are attached.</string>
+    <string name="report_send">Send</string>
+    <string name="report_sending">Sending…</string>
+    <string name="report_sent">Thank you! Your report was sent.</string>
+    <string name="report_ticket">Reference: %1$s</string>
+    <string name="report_failed_offline">Could not reach the server. Check your connection, or send it by e-mail.</string>
+    <string name="report_failed_rate">Too many reports from this network. Try again in an hour, or send it by e-mail.</string>
+    <string name="report_failed_rejected">The server did not accept this report. Send it by e-mail instead.</string>
+    <string name="report_email">Send by e-mail instead</string>
+    <string name="report_no_mail">No mail app found. Write to %1$s.</string>
 </resources>

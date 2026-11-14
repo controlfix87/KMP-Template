@@ -35,7 +35,7 @@ so TPL-013 and TPL-014 remain external validation tasks.
 | Debug APK + instrumentation APK assembly | `./gradlew :androidApp:assembleDebug :androidApp:assembleDebugAndroidTest` | Pass |
 | Release build with R8 + resource shrinking | `./gradlew :androidApp:assembleRelease` | Pass, unsigned release APK produced |
 | 16 KB page / ZIP alignment check | `python3 scripts/check_apk.py androidApp/build/outputs/apk/debug/androidApp-debug.apk` | Pass, 2 native 64-bit libraries checked |
-| Renamed-project generation | `python3 scripts/new_project.py --name SmokeApp --package com.example.smokeapp --destination <tmp>` | Generated project has no leftover `kmptemplate`/`KMPTemplate` identifiers outside the generator script/tests themselves |
+| Renamed-project generation | `python3 scripts/new_project.py --name SmokeApp --package com.example.smokeapp --destination <tmp>` | Generated project has no leftover `cmptemplate`/`CMPTemplate` identifiers outside the generator script/tests themselves |
 | Renamed-project full verification gate | `./scripts/verify.sh` in the generated `SmokeApp` copy | Pass end-to-end (static checks, generator tests, Gradle unit tests, lint, debug + androidTest APK assembly), then deleted |
 
 ## Language stack (TPL-016), executed 2026-09-18
@@ -62,7 +62,7 @@ template's build of it. Rotation was not covered even there — the phone was lo
 `user_rotation` never took effect.
 
 **iOS: written, never compiled, never run.** `common/core/designsystem/src/iosMain/.../i18n/` has no
-compilation on this ARM64 Linux host (iOS targets are off unless `kmptemplate.enableIos=true` or
+compilation on this ARM64 Linux host (iOS targets are off unless `cmptemplate.enableIos=true` or
 macOS). Beyond compilation it carries a documented CMP 1.11.1 limitation — see
 [LOCALIZATION.md](LOCALIZATION.md).
 
@@ -76,7 +76,7 @@ Two real bugs were found and fixed while running the original gate, not by sourc
   the actual cause. Clearing `androidApp/build` and the build cache and rerunning with
   `--rerun-tasks` fixed it; no source change was needed. Kept here because it looked
   like a resource-authoring bug until reproduced with a clean cache.
-- `androidApp/src/main/kotlin/com/kmptemplate/app/di/AppModule.kt` used Koin's `onClose`
+- `androidApp/src/main/kotlin/com/cmptemplate/app/di/AppModule.kt` used Koin's `onClose`
   infix without importing `org.koin.dsl.onClose`, which failed `compileDebugKotlin`
   with unresolved-reference errors. Fixed by adding the import.
 

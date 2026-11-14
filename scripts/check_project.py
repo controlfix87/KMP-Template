@@ -34,6 +34,9 @@ DISPATCHERS_ALLOWED_FILE = 'DispatcherProvider.kt'
 # renders English on Android <= 33.
 REQUIRED_LOCALES = ('he', 'iw', 'ru', 'fr')
 
+def strip_common(parts):
+    return tuple(parts[1:]) if parts and parts[0] == 'common' else tuple(parts)
+
 def purity(root):
     errors = []
     for path in files(root):
@@ -73,13 +76,16 @@ def check(root, only=False):
         if path.suffix == '.xml':
             ET.parse(path)
         if path.name == 'build.gradle.kts':
-            module = path.parent.relative_to(root).parts
+            # Shared modules live under common/; it is a folder, not a layer, so drop it on both sides.
+            module = strip_common(path.parent.relative_to(root).parts)
             source = path.read_text()
             dependencies = re.findall(r'project\("(:[^"\n]+)"\)', source)
-            dependencies += [':' + item.replace('.', ':') for item in re.findall(r'projects\.((?:core|feature)\.[a-zA-Z0-9_.]+)', source)]
+            dependencies += [':' + item.replace('.', ':') for item in re.findall(r'projects\.((?:common\.)?(?:core|feature|sharedApp)\.?[a-zA-Z0-9_.]*)', source)]
             for dependency in dependencies:
-                parts = dependency.strip(':').split(':')
-                if module and module[0] == 'core' and parts[0] in {'feature', 'androidApp', 'sharedApp'}:
+                parts = strip_common(tuple(dependency.strip(':').split(':')))
+                if not parts:
+                    continue
+                if module and module[0] == 'core' and parts[0] in {'feature', 'androidApp', 'sharedApp', 'desktopApp'}:
                     errors.append(f'{path}: core cannot depend on {dependency}')
                 if module and module[0] == 'feature' and parts[0] == 'feature' and len(module) > 1 and module[1] != parts[1]:
                     errors.append(f'{path}: cross-feature dependency {dependency}')

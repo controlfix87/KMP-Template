@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KMPTemplate</string>
+    <string name="app_name">CMPTemplate</string>
 
     <string name="example_title">Пример</string>
     <string name="example_loading">Загрузка…</string>
@@ -14,4 +14,58 @@
 
     <string name="language">Язык</string>
     <string name="language_close">Закрыть</string>
+
+    <!-- Shared screens: theme, onboarding, About, reports. -->
+    <string name="common_back">Назад</string>
+    <string name="common_close">Закрыть</string>
+    <string name="theme">Тема</string>
+    <string name="theme_system">Как на устройстве</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="onb_step_of">Шаг %1$d из %2$d</string>
+    <string name="onb_step_welcome">Начало</string>
+    <string name="onb_step_app">Настройка</string>
+    <string name="onb_step_done">Готово</string>
+    <string name="onb_welcome_title">Добро пожаловать в %1$s</string>
+    <string name="onb_welcome_body">Выберите язык и оформление. Их можно изменить позже в разделе «О приложении».</string>
+    <string name="onb_app_title">Под себя</string>
+    <string name="onb_app_body">Шаблонный шаг: замените его тем, что нужно приложению при первом запуске, например разрешением, учётной записью или первым выбором. Настройка должна быть короткой, остальное — в настройках.</string>
+    <string name="onb_done_title">Всё готово</string>
+    <string name="onb_done_body">Эту настройку можно пройти снова в разделе «О приложении».</string>
+    <string name="onb_back">Назад</string>
+    <string name="onb_next">Далее</string>
+    <string name="onb_skip">Пропустить</string>
+    <string name="onb_start">Начать</string>
+    <string name="about_title">О приложении</string>
+    <string name="about_version">Версия %1$s</string>
+    <string name="about_made_by">Создано ControlFix</string>
+    <string name="about_body">Замените эту строку одним-двумя предложениями о том, что делает приложение.</string>
+    <string name="about_website">Сайт</string>
+    <string name="about_privacy">Политика конфиденциальности</string>
+    <string name="about_feedback">Помощь и отзывы</string>
+    <string name="about_report">Сообщить о проблеме</string>
+    <string name="about_suggest">Предложить идею</string>
+    <string name="about_support">Написать на %1$s</string>
+    <string name="about_settings">Настройки</string>
+    <string name="about_run_setup">Пройти настройку снова</string>
+    <string name="report_title">Сообщение или идея</string>
+    <string name="report_body">Отправляется напрямую разработчику вместе с данными устройства.</string>
+    <string name="report_kind_crash">Сбой</string>
+    <string name="report_kind_bug">Проблема</string>
+    <string name="report_kind_suggestion">Идея</string>
+    <string name="report_field_title">Заголовок</string>
+    <string name="report_field_message">Что произошло или чего бы вам хотелось</string>
+    <string name="report_field_contact">E-mail для ответа (необязательно)</string>
+    <string name="report_logs">Приложить журналы</string>
+    <string name="report_logs_hint">Недавний журнал приложения и последний сбой. Токены, e-mail и сетевые адреса сначала удаляются.</string>
+    <string name="report_crash_attached">Приложение неожиданно закрылось %1$s; подробности приложены.</string>
+    <string name="report_send">Отправить</string>
+    <string name="report_sending">Отправка…</string>
+    <string name="report_sent">Спасибо! Сообщение отправлено.</string>
+    <string name="report_ticket">Номер: %1$s</string>
+    <string name="report_failed_offline">Не удалось связаться с сервером. Проверьте подключение или отправьте по e-mail.</string>
+    <string name="report_failed_rate">Слишком много сообщений из этой сети. Попробуйте через час или отправьте по e-mail.</string>
+    <string name="report_failed_rejected">Сервер не принял сообщение. Отправьте его по e-mail.</string>
+    <string name="report_email">Отправить по e-mail</string>
+    <string name="report_no_mail">Почтовое приложение не найдено. Напишите на %1$s.</string>
 </resources>

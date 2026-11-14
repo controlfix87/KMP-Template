@@ -1,10 +1,17 @@
 plugins {
-    alias(libs.plugins.kmptemplate.kmp.compose)
+    alias(libs.plugins.cmptemplate.cmp.compose)
+}
+
+kotlin {
+    sourceSets.androidMain.dependencies {
+        // LocalActivity + enableEdgeToEdge for SystemBarsEffect (bar icons follow the app theme).
+        implementation(libs.androidx.activity.compose)
+    }
 }
 
 compose.resources {
     publicResClass = true
-    packageOfResClass = "com.kmptemplate.core.designsystem.generated.resources"
+    packageOfResClass = "com.cmptemplate.core.designsystem.generated.resources"
 }
 
 // Compose Resources matches a `values-<lang>` directory by exact string against

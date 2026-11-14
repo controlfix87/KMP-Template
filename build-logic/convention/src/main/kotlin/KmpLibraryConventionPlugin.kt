@@ -18,6 +18,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
         extensions.configure<KotlinMultiplatformExtension> {
             jvmToolchain(21)
             configureAndroidTarget(this@with)
+            jvm(DESKTOP_TARGET)
             if (iosEnabled) {
                 iosArm64()
                 iosSimulatorArm64()

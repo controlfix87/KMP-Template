@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KMPTemplate</string>
+    <string name="app_name">CMPTemplate</string>
 
     <string name="example_title">Exemple</string>
     <string name="example_loading">Chargement…</string>
@@ -14,4 +14,58 @@
 
     <string name="language">Langue</string>
     <string name="language_close">Fermer</string>
+
+    <!-- Shared screens: theme, onboarding, About, reports. -->
+    <string name="common_back">Retour</string>
+    <string name="common_close">Fermer</string>
+    <string name="theme">Thème</string>
+    <string name="theme_system">Comme l’appareil</string>
+    <string name="theme_light">Clair</string>
+    <string name="theme_dark">Sombre</string>
+    <string name="onb_step_of">Étape %1$d sur %2$d</string>
+    <string name="onb_step_welcome">Bienvenue</string>
+    <string name="onb_step_app">Réglages</string>
+    <string name="onb_step_done">Terminé</string>
+    <string name="onb_welcome_title">Bienvenue dans %1$s</string>
+    <string name="onb_welcome_body">Choisissez la langue et l’apparence. Vous pourrez les modifier plus tard dans À propos.</string>
+    <string name="onb_app_title">À votre façon</string>
+    <string name="onb_app_body">Étape modèle : remplacez-la par ce dont l’app a besoin au premier lancement, comme une autorisation, un compte ou un premier choix. Gardez la configuration courte ; le reste va dans les réglages.</string>
+    <string name="onb_done_title">Tout est prêt</string>
+    <string name="onb_done_body">Vous pouvez relancer cette configuration depuis À propos.</string>
+    <string name="onb_back">Retour</string>
+    <string name="onb_next">Suivant</string>
+    <string name="onb_skip">Passer</string>
+    <string name="onb_start">Commencer</string>
+    <string name="about_title">À propos</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_made_by">Créé par ControlFix</string>
+    <string name="about_body">Remplacez cette ligne par une ou deux phrases sur ce que fait l’app.</string>
+    <string name="about_website">Site web</string>
+    <string name="about_privacy">Confidentialité</string>
+    <string name="about_feedback">Aide et avis</string>
+    <string name="about_report">Signaler un problème</string>
+    <string name="about_suggest">Envoyer une suggestion</string>
+    <string name="about_support">Écrire à %1$s</string>
+    <string name="about_settings">Réglages</string>
+    <string name="about_run_setup">Relancer la configuration</string>
+    <string name="report_title">Signalement ou suggestion</string>
+    <string name="report_body">Envoyé directement au développeur, avec les détails de l’appareil.</string>
+    <string name="report_kind_crash">Plantage</string>
+    <string name="report_kind_bug">Problème</string>
+    <string name="report_kind_suggestion">Suggestion</string>
+    <string name="report_field_title">Titre</string>
+    <string name="report_field_message">Ce qui s’est passé, ou ce que vous aimeriez</string>
+    <string name="report_field_contact">E-mail pour une réponse (facultatif)</string>
+    <string name="report_logs">Joindre les journaux</string>
+    <string name="report_logs_hint">Le journal récent de l’app et le dernier plantage. Les jetons, e-mails et adresses réseau sont retirés d’abord.</string>
+    <string name="report_crash_attached">L’app s’est fermée de façon inattendue le %1$s ; les détails sont joints.</string>
+    <string name="report_send">Envoyer</string>
+    <string name="report_sending">Envoi…</string>
+    <string name="report_sent">Merci ! Votre message a été envoyé.</string>
+    <string name="report_ticket">Référence : %1$s</string>
+    <string name="report_failed_offline">Serveur injoignable. Vérifiez la connexion, ou envoyez-le par e-mail.</string>
+    <string name="report_failed_rate">Trop de messages depuis ce réseau. Réessayez dans une heure, ou envoyez-le par e-mail.</string>
+    <string name="report_failed_rejected">Le serveur a refusé ce message. Envoyez-le plutôt par e-mail.</string>
+    <string name="report_email">Envoyer par e-mail</string>
+    <string name="report_no_mail">Aucune app de messagerie. Écrivez à %1$s.</string>
 </resources>

@@ -3,5 +3,5 @@
     <!-- The app label needs a plain Android string resource (the manifest
          can't read composeResources); every other user-facing string lives
          in :common:core:designsystem's composeResources instead. -->
-    <string name="app_name">KMPTemplate</string>
+    <string name="app_name">CMPTemplate</string>
 </resources>

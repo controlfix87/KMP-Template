@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.kmptemplate.kmp.library)
+    alias(libs.plugins.cmptemplate.kmp.library)
 }
 
 kotlin {
@@ -15,6 +15,9 @@ kotlin {
             implementation(libs.ktor.client.logging)
         }
         androidMain.dependencies {
+            implementation(libs.ktor.client.okhttp)
+        }
+        getByName("desktopMain").dependencies {
             implementation(libs.ktor.client.okhttp)
         }
         findByName("iosMain")?.dependencies {

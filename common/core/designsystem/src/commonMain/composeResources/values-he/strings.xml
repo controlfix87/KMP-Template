@@ -7,7 +7,7 @@
       `Locale.getDefault().language`, which reports Hebrew as the withdrawn 1989 code "iw" on
       Android <= 33 and as "he" on 34+. See common/core/designsystem/build.gradle.kts.
     -->
-    <string name="app_name">KMPTemplate</string>
+    <string name="app_name">CMPTemplate</string>
 
     <string name="example_title">דוגמה</string>
     <string name="example_loading">טוען…</string>
@@ -21,4 +21,58 @@
 
     <string name="language">שפה</string>
     <string name="language_close">סגור</string>
+
+    <!-- Shared screens: theme, onboarding, About, reports. -->
+    <string name="common_back">חזרה</string>
+    <string name="common_close">סגירה</string>
+    <string name="theme">ערכת נושא</string>
+    <string name="theme_system">לפי המכשיר</string>
+    <string name="theme_light">בהירה</string>
+    <string name="theme_dark">כהה</string>
+    <string name="onb_step_of">שלב %1$d מתוך %2$d</string>
+    <string name="onb_step_welcome">ברוכים הבאים</string>
+    <string name="onb_step_app">הגדרה</string>
+    <string name="onb_step_done">סיום</string>
+    <string name="onb_welcome_title">ברוכים הבאים ל־%1$s</string>
+    <string name="onb_welcome_body">בחרו שפה ומראה. אפשר לשנות את שניהם אחר כך במסך אודות.</string>
+    <string name="onb_app_title">התאמה אישית</string>
+    <string name="onb_app_body">שלב לדוגמה: החליפו אותו במה שהאפליקציה צריכה בהפעלה הראשונה, כמו הרשאה, חשבון או בחירה ראשונה. שמרו על הגדרה קצרה; כל השאר שייך להגדרות.</string>
+    <string name="onb_done_title">הכול מוכן</string>
+    <string name="onb_done_body">אפשר להריץ את ההגדרה שוב ממסך אודות.</string>
+    <string name="onb_back">הקודם</string>
+    <string name="onb_next">הבא</string>
+    <string name="onb_skip">דילוג</string>
+    <string name="onb_start">התחלה</string>
+    <string name="about_title">אודות</string>
+    <string name="about_version">גרסה %1$s</string>
+    <string name="about_made_by">נוצר על ידי ControlFix</string>
+    <string name="about_body">החליפו שורה זו במשפט או שניים על מה שהאפליקציה עושה.</string>
+    <string name="about_website">אתר</string>
+    <string name="about_privacy">מדיניות פרטיות</string>
+    <string name="about_feedback">עזרה ומשוב</string>
+    <string name="about_report">דיווח על בעיה</string>
+    <string name="about_suggest">שליחת הצעה</string>
+    <string name="about_support">דוא״ל %1$s</string>
+    <string name="about_settings">הגדרות</string>
+    <string name="about_run_setup">הרצת ההגדרה מחדש</string>
+    <string name="report_title">דיווח או הצעה</string>
+    <string name="report_body">נשלח ישירות למפתח, עם פרטי המכשיר.</string>
+    <string name="report_kind_crash">קריסה</string>
+    <string name="report_kind_bug">בעיה</string>
+    <string name="report_kind_suggestion">הצעה</string>
+    <string name="report_field_title">כותרת</string>
+    <string name="report_field_message">מה קרה, או מה הייתם רוצים</string>
+    <string name="report_field_contact">דוא״ל לתשובה (לא חובה)</string>
+    <string name="report_logs">צירוף יומני האפליקציה</string>
+    <string name="report_logs_hint">היומן האחרון של האפליקציה והקריסה האחרונה. אסימונים, כתובות דוא״ל וכתובות רשת מוסרים קודם.</string>
+    <string name="report_crash_attached">האפליקציה נסגרה באופן לא צפוי ב־%1$s; הפרטים מצורפים.</string>
+    <string name="report_send">שליחה</string>
+    <string name="report_sending">שולח…</string>
+    <string name="report_sent">תודה! הדיווח נשלח.</string>
+    <string name="report_ticket">מספר פנייה: %1$s</string>
+    <string name="report_failed_offline">לא ניתן להגיע לשרת. בדקו את החיבור, או שלחו בדוא״ל.</string>
+    <string name="report_failed_rate">יותר מדי דיווחים מהרשת הזו. נסו שוב בעוד שעה, או שלחו בדוא״ל.</string>
+    <string name="report_failed_rejected">השרת לא קיבל את הדיווח. שלחו אותו בדוא״ל במקום.</string>
+    <string name="report_email">שליחה בדוא״ל במקום</string>
+    <string name="report_no_mail">לא נמצאה אפליקציית דוא״ל. כתבו אל %1$s.</string>
 </resources>

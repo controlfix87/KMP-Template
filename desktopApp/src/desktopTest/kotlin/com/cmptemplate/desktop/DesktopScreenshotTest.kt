@@ -6,17 +6,17 @@ import androidx.compose.ui.test.runDesktopComposeUiTest
 import com.cmptemplate.app.App
 import com.cmptemplate.app.appModules
 import com.cmptemplate.core.designsystem.CMPTemplateTheme
-import com.cmptemplate.core.designsystem.ThemeMode
+import com.cmptemplate.core.datastore.InMemoryUserPreferences
+import com.cmptemplate.core.datastore.UserPreferencesRepository
+import com.cmptemplate.core.model.ThemeMode
+import com.cmptemplate.core.model.UserSettings
 import com.cmptemplate.core.designsystem.i18n.AppLocale
 import com.cmptemplate.core.designsystem.i18n.LocaleStore
-import com.cmptemplate.core.designsystem.settings.AppPreferences
-import com.cmptemplate.core.designsystem.settings.InMemoryPreferences
 import com.cmptemplate.core.model.AppInfo
 import com.cmptemplate.feature.about.ui.AboutScreen
 import com.cmptemplate.feature.onboarding.ui.OnboardingScreen // [onboarding]
 import com.cmptemplate.feature.onboarding.ui.OnboardingState // [onboarding]
 import com.cmptemplate.feature.onboarding.ui.OnboardingStep // [onboarding]
-import com.cmptemplate.feature.onboarding.ui.OnboardingViewModel // [onboarding]
 import io.github.takahirom.roborazzi.captureRoboImage
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -34,7 +34,7 @@ private const val DIR = "build/outputs/roborazzi"
 @OptIn(ExperimentalTestApi::class)
 class DesktopScreenshotTest {
     // In-memory settings and language: a test must never write the developer's real preferences.
-    private val preferences = InMemoryPreferences()
+    private val preferences = InMemoryUserPreferences(UserSettings(onboardingDone = true))
 
     @BeforeTest fun koin() {
         val memoryLocale = object : LocaleStore {
@@ -44,7 +44,7 @@ class DesktopScreenshotTest {
         }
         startKoin {
             modules(appModules + desktopHostModule() + module {
-                single<AppPreferences> { preferences }
+                single<UserPreferencesRepository> { preferences }
                 single<LocaleStore> { memoryLocale }
             })
         }
@@ -53,7 +53,6 @@ class DesktopScreenshotTest {
     @AfterTest fun stop() = stopKoin()
 
     @Test fun home() = runDesktopComposeUiTest(width = 1024, height = 760) {
-        OnboardingViewModel.markDone(preferences) // [onboarding]
         setContent { App() }
         waitForIdle()
         onRoot().captureRoboImage("$DIR/desktop_home.png")
@@ -79,7 +78,7 @@ class DesktopScreenshotTest {
     @Test fun onboarding() = runDesktopComposeUiTest(width = 1024, height = 760) {
         setContent {
             CMPTemplateTheme(darkTheme = false) {
-                OnboardingScreen(OnboardingState(OnboardingStep.WELCOME), AppLocale.French, ThemeMode.LIGHT, {}, {}, {})
+                OnboardingScreen(OnboardingState(OnboardingStep.WELCOME, AppLocale.French, ThemeMode.LIGHT)) {}
             }
         }
         waitForIdle()

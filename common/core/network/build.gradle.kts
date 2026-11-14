@@ -20,8 +20,10 @@ kotlin {
         getByName("desktopMain").dependencies {
             implementation(libs.ktor.client.okhttp)
         }
-        findByName("iosMain")?.dependencies {
-            implementation(libs.ktor.client.darwin)
+        // iosMain exists only when Apple targets are on (macOS); `findByName` ran before the
+        // default hierarchy created it, so the Darwin engine was never added. configureEach waits.
+        matching { it.name == "iosMain" }.configureEach {
+            dependencies { implementation(libs.ktor.client.darwin) }
         }
         commonTest.dependencies {
             implementation(libs.ktor.client.mock)

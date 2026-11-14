@@ -130,7 +130,7 @@ private fun brandTypography(): Typography {
 
 /**
  * Single theme entry point every app/feature composable root wraps itself in. Dark navy or light
- * paper; the app passes [darkTheme] from [ThemeManager] (the user's choice), tests pass it directly.
+ * paper; the app passes [darkTheme] from the stored ThemeMode (DataStore, via AppViewModel), tests pass it directly.
  * Keep colours here, not per feature, so a rebrand is a one-file change.
  */
 @Composable

@@ -49,7 +49,8 @@ no database plugin or schema is imposed on a new app before it needs persistence
 |---|---|
 | `common:core:model` | Pure shared domain models (`AppInfo`, sample item), JVM + optional iOS |
 | `common:core:common` | Typed results/errors, coroutine dispatcher abstraction |
-| `common:core:designsystem` | ControlFix theme (palette, Exo 2), light/dark/system `ThemeManager`, `AppPreferences`, shared components (`ScreenHeader`, `SectionCard`, `OptionCard`, `StepProgress`, `AppMark`, `Wordmark`, `AppIcons`), the language stack (`i18n/`) and English/Hebrew/Russian/French resources |
+| `common:core:designsystem` | ControlFix theme (palette, Exo 2), `ThemeMode.isDark()`, shared components (`ScreenHeader`, `SectionCard`, `OptionCard`, `StepProgress`, `AppMark`, `Wordmark`, `AppIcons`), the language stack (`i18n/`) and English/Hebrew/Russian/French resources |
+| `common:core:datastore` | Jetpack DataStore (Preferences) on Android/iOS/desktop: `UserPreferencesRepository` (theme, onboarding done) as a `Flow`, corrupt-file recovery, in-memory fake |
 | `common:core:network` | HTTPS Ktor client, timeouts, redacted optional logging, OkHttp/Darwin engines |
 | `common:feature:example` | Repository seam, offline demo, tested HTTP adapter, MVI list/search and detail entries |
 | `common:feature:about` | Branded About, report/suggestion screen, `HttpReportSender`, `Redactor`, e-mail fallback, crash recorder + diagnostics per platform |
@@ -71,7 +72,7 @@ APIs into common source sets. Platform interfaces use expect/actual or injection
 `#101D33` → ink `#070C17`, paper `#E9F2F7`) as a dark navy and a light paper scheme, and Exo 2
 (SIL OFL, `docs/branding/Exo2-OFL.txt`) for headlines, titles and labels; body text stays on the
 platform font. Use `primary` for lime: on light surfaces it is the readable deep lime. The user picks
-light, dark or "follow device" (`ThemeManager`, in onboarding and About); Android's status/navigation
+light, dark or "follow device" (stored in DataStore, chosen in onboarding and About); Android's status/navigation
 bar icons follow the *app's* theme, not the device's. `AppMark` is a placeholder mark drawn in code:
 replace it, the Android launcher icon and `about_body` with the product's own.
 
@@ -133,7 +134,8 @@ process-death, foldable/freeform, RTL, font-scale and IME checks are in
 English, Hebrew, Russian and French ship by default, listed once in
 `common/core/designsystem/.../i18n/AppLocale.kt` and backed by one `values-<code>/strings.xml`
 each. The app language is **never** taken from the device language and changes in exactly
-one way: the user picks it in `LanguagePickerDialog`.
+one way: the user picks it through `LocaleManager.setLocale`, from the language cards (`LanguageChoices`)
+in onboarding and About (`LanguagePickerDialog` is the compact alternative).
 
 That is a deliberate stance, not a simplification. Android re-derives the process-global
 `Locale.getDefault()` — which Compose Multiplatform resolves every `stringResource()`

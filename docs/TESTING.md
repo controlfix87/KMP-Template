@@ -17,6 +17,7 @@ empty tests just to increase counts.
 | HTTP adapter | same feature task | Base-path joining, statuses, malformed JSON, cancellation, HTTPS validation |
 | DI | `:androidApp:testDebugUnitTest` | Real module list resolves repository and entry ViewModel |
 | Device | `:androidApp:connectedDebugAndroidTest` | Query/detail restoration, real phone rotation, safe drawing bounds |
+| Settings (DataStore) | `:common:core:datastore:desktopTest` | Defaults, write/read back on a real file, corrupt file falls back to defaults |
 | Report sender | `:common:feature:about:testAndroidHostTest` / `desktopTest` | Contract body + `x-report-app`, redacted log/crash, crash cleared after send, 429/4xx/5xx/offline mapping, cancellation |
 | Report / onboarding ViewModels | same, and `:common:feature:onboarding:desktopTest` | Send gating, crash notice, single send, e-mail fallback, saved draft/step, skip/finish/reset |
 | Screenshots (Android) | `:androidApp:recordRoborazziDebug` (save) / `verifyRoborazziDebug` (compare) | Home, onboarding steps (also Hebrew light, Fold), About light/dark/Fold, report crash/failed/sent drawn by Robolectric, in `androidApp/build/outputs/roborazzi/`; no device needed |

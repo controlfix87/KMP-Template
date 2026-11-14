@@ -27,7 +27,7 @@ class TemplateToolsTest(unittest.TestCase):
             path.parent.mkdir(parents=True)
             path.write_text('import androidx.work.WorkManager\n')
             self.assertEqual(1, len(load('check_project').purity(root)))
-            path.write_text('import androidx.lifecycle.ViewModel\nimport androidx.navigation3.runtime.NavKey\nimport androidx.savedstate.SavedState\n')
+            path.write_text('import androidx.lifecycle.ViewModel\nimport androidx.navigation3.runtime.NavKey\nimport androidx.savedstate.SavedState\nimport androidx.datastore.core.DataStore\n')
             self.assertEqual([], load('check_project').purity(root))
 
     def test_nested_direct_dispatchers_import_fails_outside_dispatcher_provider(self):

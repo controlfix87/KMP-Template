@@ -3,6 +3,9 @@ plugins {
 }
 
 kotlin {
+    sourceSets.commonMain.dependencies {
+        api(project(":common:core:model")) // ThemeMode in the theme API
+    }
     sourceSets.androidMain.dependencies {
         // LocalActivity + enableEdgeToEdge for SystemBarsEffect (bar icons follow the app theme).
         implementation(libs.androidx.activity.compose)

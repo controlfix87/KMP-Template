@@ -84,6 +84,7 @@ dependencies {
     implementation(project(":common:core:common"))
     implementation(project(":common:core:designsystem"))
     implementation(project(":common:core:network"))
+    implementation(project(":common:core:datastore"))
     implementation(project(":common:feature:example"))
     implementation(project(":common:feature:about"))
     implementation(project(":common:feature:onboarding")) // [onboarding]

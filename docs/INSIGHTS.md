@@ -24,6 +24,26 @@ shipped. What they learned is applied here; keep it when you replace the sample.
 | Release signing from a `keystore.properties` in the private assets repo, located by a Gradle property on the build machine; never in the repo. | GameController | `androidApp/build.gradle.kts` |
 | AGP 9: do not apply `org.jetbrains.kotlin.android` to the app; set `buildConfig = true` explicitly. | both | `androidApp/build.gradle.kts` (already) |
 
+## Architecture rules (best practice, enforced by structure)
+
+- **State holders:** every screen has a ViewModel exposing one `StateFlow<UiState>`
+  (`stateIn(viewModelScope, WhileSubscribed(5_000), initial)`), a sealed `Action` interface and a
+  stateless `Screen(state, onAction)`; the `Root` composable only wires `koinViewModel()` and
+  `collectAsStateWithLifecycle()`. Screens never inject repositories or managers.
+- **Navigation results are state, not events:** onboarding sets `finished` after DataStore has
+  stored "done"; the root leaves on it. No one-off event channels.
+- **Saved state:** what the user typed or where they are (drafts, step, query) goes in
+  `SavedStateHandle`; settings in DataStore; nothing user-visible only in `remember`.
+- **Settings:** Jetpack DataStore (Preferences), one instance per file per process (Koin `single`),
+  read as a `Flow`, written with `edit`, corrupt files replaced with defaults. The app waits for the
+  first read (`AppUiState.Loading`) instead of drawing a guessed theme or start screen. Exception:
+  the language, which Android must read synchronously before DI exists.
+- **Koin:** one module per feature (`viewModelOf(::X)`), platform pieces as `expect fun xModule()`,
+  host-only facts (`AppInfo`, Android `Context`) supplied by the host; a DI test resolves every
+  ViewModel from the production module list with only host bindings faked.
+- **Layers:** `core` never depends on `feature`, features never on each other (checked by
+  `scripts/check_project.py`); `commonMain` never imports platform APIs.
+
 ## Not applied (product decisions)
 
 - **Ads and consent (LockdownControl: AdMob banner + UMP):** add per product, never on a lock or

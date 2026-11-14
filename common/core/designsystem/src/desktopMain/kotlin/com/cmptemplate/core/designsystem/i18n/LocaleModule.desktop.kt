@@ -1,11 +1,12 @@
 package com.cmptemplate.core.designsystem.i18n
 
-import com.cmptemplate.core.designsystem.settings.desktopPreferenceNode
+import java.util.prefs.Preferences
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
 internal class JavaPreferencesLocaleStore : LocaleStore {
-    private val node = desktopPreferenceNode()
+    /** The user's preference node (registry on Windows, plist on macOS, ~/.java on Linux). */
+    private val node = Preferences.userRoot().node("cmptemplate")
 
     override fun read(): String? = node.get(KEY_APP_LOCALE, null)
 

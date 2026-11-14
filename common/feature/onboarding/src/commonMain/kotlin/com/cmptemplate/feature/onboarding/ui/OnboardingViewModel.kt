@@ -2,12 +2,17 @@ package com.cmptemplate.feature.onboarding.ui
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.cmptemplate.core.designsystem.settings.AppPreferences
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
 import androidx.lifecycle.viewModelScope
+import com.cmptemplate.core.datastore.UserPreferencesRepository
+import com.cmptemplate.core.designsystem.i18n.AppLocale
+import com.cmptemplate.core.designsystem.i18n.LocaleManager
+import com.cmptemplate.core.model.ThemeMode
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * The steps, in order. WELCOME (language + theme) and DONE stay; replace APP with the product's
@@ -16,7 +21,13 @@ import androidx.lifecycle.viewModelScope
  */
 enum class OnboardingStep { WELCOME, APP, DONE }
 
-data class OnboardingState(val step: OnboardingStep = OnboardingStep.WELCOME) {
+data class OnboardingState(
+    val step: OnboardingStep = OnboardingStep.WELCOME,
+    val locale: AppLocale = AppLocale.Default,
+    val theme: ThemeMode = ThemeMode.SYSTEM,
+    /** Set once "done" is stored; the screen then leaves (state, not a one-off event). */
+    val finished: Boolean = false,
+) {
     val index: Int get() = step.ordinal
     val count: Int get() = OnboardingStep.entries.size
     val isLast: Boolean get() = step == OnboardingStep.entries.last()
@@ -27,6 +38,8 @@ sealed interface OnboardingAction {
     data object Back : OnboardingAction
     /** Jump back to a finished step (tapping it in the progress bar). Never forward. */
     data class GoTo(val index: Int) : OnboardingAction
+    data class SetLocale(val locale: AppLocale) : OnboardingAction
+    data class SetTheme(val mode: ThemeMode) : OnboardingAction
     /** Leave now, keeping the defaults for the remaining steps. Shown on every step but the last. */
     data object Skip : OnboardingAction
     data object Finish : OnboardingAction
@@ -35,40 +48,39 @@ sealed interface OnboardingAction {
 /**
  * The step lives in SavedStateHandle: a language change recreates the Activity on Android and the
  * user must land on the same step (LockdownControl), and process death must not restart setup.
+ * "Done" is stored in DataStore before [OnboardingState.finished] turns true, so leaving can never
+ * outrun the write.
  */
 class OnboardingViewModel(
-    private val preferences: AppPreferences,
+    private val preferences: UserPreferencesRepository,
+    private val localeManager: LocaleManager,
     private val saved: SavedStateHandle,
 ) : ViewModel() {
     private val stepIndex = saved.getStateFlow(KEY_STEP, 0)
+    private val finished = MutableStateFlow(false)
 
-    val state: StateFlow<OnboardingState> = stepIndex
-        .map { OnboardingState(OnboardingStep.entries[it.coerceIn(0, OnboardingStep.entries.lastIndex)]) }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, OnboardingState(OnboardingStep.entries[stepIndex.value.coerceIn(0, OnboardingStep.entries.lastIndex)]))
+    val state: StateFlow<OnboardingState> = combine(stepIndex, localeManager.locale, preferences.settings, finished) { i, locale, settings, done ->
+        OnboardingState(stepOf(i), locale, settings.themeMode, done)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), OnboardingState(stepOf(stepIndex.value), localeManager.locale.value))
 
-    /** Returns true when onboarding is finished and the caller should leave it. */
-    fun onAction(action: OnboardingAction): Boolean {
+    fun onAction(action: OnboardingAction) {
         val current = stepIndex.value
         when (action) {
             OnboardingAction.Next -> saved[KEY_STEP] = (current + 1).coerceAtMost(OnboardingStep.entries.lastIndex)
             OnboardingAction.Back -> saved[KEY_STEP] = (current - 1).coerceAtLeast(0)
             is OnboardingAction.GoTo -> if (action.index in 0 until current) saved[KEY_STEP] = action.index
-            OnboardingAction.Skip, OnboardingAction.Finish -> {
-                markDone(preferences)
-                saved[KEY_STEP] = 0
-                return true
+            is OnboardingAction.SetLocale -> localeManager.setLocale(action.locale)
+            is OnboardingAction.SetTheme -> viewModelScope.launch { preferences.setThemeMode(action.mode) }
+            OnboardingAction.Skip, OnboardingAction.Finish -> viewModelScope.launch {
+                preferences.setOnboardingDone(true)
+                finished.value = true
             }
         }
-        return false
     }
 
-    companion object {
-        private const val KEY_STEP = "onboarding_step"
-        const val KEY_DONE = "onboarding_done"
+    private fun stepOf(index: Int) = OnboardingStep.entries[index.coerceIn(0, OnboardingStep.entries.lastIndex)]
 
-        fun isDone(preferences: AppPreferences): Boolean = preferences.getBoolean(KEY_DONE)
-        fun markDone(preferences: AppPreferences) = preferences.putBoolean(KEY_DONE, true)
-        /** "Run setup again" from About. */
-        fun reset(preferences: AppPreferences) = preferences.remove(KEY_DONE)
+    private companion object {
+        const val KEY_STEP = "onboarding_step"
     }
 }

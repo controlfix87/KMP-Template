@@ -13,7 +13,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmptemplate.core.designsystem.ThemeMode
+import com.cmptemplate.core.model.ThemeMode
 import com.cmptemplate.core.designsystem.generated.resources.Res
 import com.cmptemplate.core.designsystem.generated.resources.language
 import com.cmptemplate.core.designsystem.generated.resources.theme

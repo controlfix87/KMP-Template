@@ -2,7 +2,7 @@
 
 English, Hebrew, Russian and French ship by default. The app language is never taken from
 the device language, and changes in exactly one way: the user picks it in
-`LanguagePickerDialog`.
+the language cards (`LanguageChoices`) in onboarding and About, or `LanguagePickerDialog`.
 
 ## The bug this design exists to prevent
 

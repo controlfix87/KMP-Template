@@ -30,8 +30,7 @@ import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.cmptemplate.core.designsystem.ThemeManager
-import com.cmptemplate.core.designsystem.ThemeMode
+import com.cmptemplate.core.model.ThemeMode
 import com.cmptemplate.core.designsystem.components.AppIcons
 import com.cmptemplate.core.designsystem.components.AppMark
 import com.cmptemplate.core.designsystem.components.LanguageChoices
@@ -57,30 +56,30 @@ import com.cmptemplate.core.designsystem.generated.resources.app_name
 import com.cmptemplate.core.designsystem.generated.resources.common_back
 import com.cmptemplate.core.designsystem.generated.resources.report_no_mail
 import com.cmptemplate.core.designsystem.i18n.AppLocale
-import com.cmptemplate.core.designsystem.i18n.LocaleManager
 import com.cmptemplate.core.model.AppInfo
 import com.cmptemplate.feature.about.ControlFixLinks
 import com.cmptemplate.feature.about.report.ReportKind
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
-/** Wires DI; [AboutScreen] itself is state in, callbacks out (and screenshot-testable). */
+/** Wires the ViewModel; [AboutScreen] itself is state in, callbacks out (and screenshot-testable). */
 @Composable
-fun AboutRoot(onBack: (() -> Unit)?, onReport: (ReportKind) -> Unit, onRunSetupAgain: (() -> Unit)?) {
-    val app: AppInfo = koinInject()
-    val localeManager: LocaleManager = koinInject()
-    val themeManager: ThemeManager = koinInject()
-    val locale by localeManager.locale.collectAsStateWithLifecycle()
-    val theme by themeManager.mode.collectAsStateWithLifecycle()
+fun AboutRoot(
+    onBack: (() -> Unit)?,
+    onReport: (ReportKind) -> Unit,
+    onRunSetupAgain: (() -> Unit)?,
+    viewModel: AboutViewModel = koinViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
     AboutScreen(
-        app = app,
-        locale = locale,
-        theme = theme,
-        onLocale = localeManager::setLocale,
-        onTheme = themeManager::setMode,
+        app = state.app,
+        locale = state.locale,
+        theme = state.theme,
+        onLocale = { viewModel.onAction(AboutAction.SetLocale(it)) },
+        onTheme = { viewModel.onAction(AboutAction.SetTheme(it)) },
         onBack = onBack,
         onReport = onReport,
-        onRunSetupAgain = onRunSetupAgain,
+        onRunSetupAgain = onRunSetupAgain?.let { navigate -> { viewModel.onAction(AboutAction.RunSetupAgain); navigate() } },
     )
 }
 

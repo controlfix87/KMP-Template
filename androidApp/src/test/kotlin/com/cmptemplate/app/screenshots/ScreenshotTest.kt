@@ -13,9 +13,11 @@ import com.cmptemplate.app.App
 import com.cmptemplate.app.androidHostModule
 import com.cmptemplate.app.appModules
 import com.cmptemplate.core.designsystem.CMPTemplateTheme
-import com.cmptemplate.core.designsystem.ThemeMode
+import com.cmptemplate.core.datastore.InMemoryUserPreferences
+import com.cmptemplate.core.datastore.UserPreferencesRepository
+import com.cmptemplate.core.model.ThemeMode
+import com.cmptemplate.core.model.UserSettings
 import com.cmptemplate.core.designsystem.i18n.AppLocale
-import com.cmptemplate.core.designsystem.settings.AppPreferences
 import com.cmptemplate.core.model.AppInfo
 import com.cmptemplate.feature.about.report.ReportKind
 import com.cmptemplate.feature.about.ui.AboutScreen
@@ -26,7 +28,6 @@ import com.cmptemplate.feature.about.ui.SendFailure
 import com.cmptemplate.feature.onboarding.ui.OnboardingScreen // [onboarding]
 import com.cmptemplate.feature.onboarding.ui.OnboardingState // [onboarding]
 import com.cmptemplate.feature.onboarding.ui.OnboardingStep // [onboarding]
-import com.cmptemplate.feature.onboarding.ui.OnboardingViewModel // [onboarding]
 import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.After
 import org.junit.Before
@@ -36,7 +37,7 @@ import org.junit.runner.RunWith
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
-import org.koin.mp.KoinPlatform
+import org.koin.dsl.module
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
@@ -65,7 +66,10 @@ class ScreenshotTest {
         startKoin {
             val context = ApplicationProvider.getApplicationContext<Application>()
             androidContext(context)
-            modules(appModules + androidHostModule(context))
+            // In-memory settings, onboarding already done: Home is the start screen.
+            modules(appModules + androidHostModule(context) + module {
+                single<UserPreferencesRepository> { InMemoryUserPreferences(UserSettings(onboardingDone = true)) }
+            })
         }
     }
 
@@ -78,7 +82,6 @@ class ScreenshotTest {
     }
 
     @Test fun home() {
-        OnboardingViewModel.markDone(KoinPlatform.getKoin().get<AppPreferences>()) // [onboarding]
         compose.setContent { App() }
         compose.waitForIdle()
         compose.onRoot().captureRoboImage("$DIR/home_phone.png")
@@ -89,7 +92,7 @@ class ScreenshotTest {
         // setContent may run once per test: switch the step through state instead.
         var step by mutableStateOf(OnboardingStep.WELCOME)
         compose.setContent {
-            CMPTemplateTheme(darkTheme = true) { OnboardingScreen(OnboardingState(step), AppLocale.English, ThemeMode.SYSTEM, {}, {}, {}) }
+            CMPTemplateTheme(darkTheme = true) { OnboardingScreen(OnboardingState(step, AppLocale.English, ThemeMode.SYSTEM)) {} }
         }
         for (s in OnboardingStep.entries) {
             compose.runOnIdle { step = s }
@@ -99,19 +102,19 @@ class ScreenshotTest {
     }
 
     @Test fun onboardingHebrewLight() = shot("onboarding_welcome_he_light", dark = false) {
-        OnboardingScreen(OnboardingState(OnboardingStep.WELCOME), AppLocale.Hebrew, ThemeMode.LIGHT, {}, {}, {})
+        OnboardingScreen(OnboardingState(OnboardingStep.WELCOME, AppLocale.Hebrew, ThemeMode.LIGHT)) {}
     }
 
     @Test @Config(qualifiers = FOLD) fun onboardingFold() = shot("onboarding_welcome_fold") {
-        OnboardingScreen(OnboardingState(OnboardingStep.WELCOME), AppLocale.English, ThemeMode.DARK, {}, {}, {})
+        OnboardingScreen(OnboardingState(OnboardingStep.WELCOME, AppLocale.English, ThemeMode.DARK)) {}
     }
     // endregion onboarding
 
-    @Test fun about() = shot("about_dark") { about() }
+    @Test fun about() = shot("about_dark") { AboutContent() }
 
-    @Test fun aboutLight() = shot("about_light", dark = false) { about() }
+    @Test fun aboutLight() = shot("about_light", dark = false) { AboutContent() }
 
-    @Test @Config(qualifiers = FOLD) fun aboutFold() = shot("about_fold") { about() }
+    @Test @Config(qualifiers = FOLD) fun aboutFold() = shot("about_fold") { AboutContent() }
 
     @Test fun report() = shot("report_crash") {
         ReportScreen(
@@ -132,7 +135,7 @@ class ScreenshotTest {
     }
 
     @Composable
-    private fun about() = AboutScreen(
+    private fun AboutContent() = AboutScreen(
         app = app, locale = AppLocale.English, theme = ThemeMode.SYSTEM,
         onLocale = {}, onTheme = {}, onBack = {}, onReport = {},
         onRunSetupAgain = {}, // [onboarding]

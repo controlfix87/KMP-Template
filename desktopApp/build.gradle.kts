@@ -18,6 +18,7 @@ kotlin {
             implementation(project(":common:sharedApp"))
             implementation(project(":common:core:model"))
             implementation(project(":common:core:designsystem"))
+            implementation(project(":common:core:datastore"))
             implementation(project(":common:feature:about"))
             implementation(project(":common:feature:onboarding")) // [onboarding]
             implementation(compose.desktop.currentOs)

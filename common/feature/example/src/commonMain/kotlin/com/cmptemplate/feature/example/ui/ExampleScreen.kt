@@ -13,38 +13,17 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cmptemplate.core.common.DataError
-import androidx.compose.runtime.saveable.rememberSaveable
 import com.cmptemplate.core.designsystem.generated.resources.*
-import com.cmptemplate.core.designsystem.i18n.LanguagePickerDialog
-import com.cmptemplate.core.designsystem.i18n.LocaleManager
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ExampleRoot(onNavigateToDetail: (String) -> Unit, onAbout: () -> Unit = {}, viewModel: ExampleViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    // The picker is wired here, not inside ExampleScreen, so that screen stays a pure
-    // state-in/actions-out composable with no DI of its own. Delete this block along with the rest
-    // of the sample -- but keep a picker somewhere, because it is the only supported way to change
-    // the language (see AppLocaleProvider for why that matters).
-    val localeManager: LocaleManager = koinInject()
-    val locale by localeManager.locale.collectAsStateWithLifecycle()
-    var showLanguagePicker by rememberSaveable { mutableStateOf(false) }
-
-    ExampleScreen(state, viewModel::onAction, onNavigateToDetail, onLanguage = { showLanguagePicker = true }, onAbout = onAbout)
-
-    if (showLanguagePicker) {
-        LanguagePickerDialog(
-            current = locale,
-            onSelect = {
-                localeManager.setLocale(it)
-                showLanguagePicker = false
-            },
-            onDismissRequest = { showLanguagePicker = false },
-        )
-    }
+    // Language and theme live in About (and onboarding): the same LanguageChoices component, the
+    // only supported way to change the language (see AppLocaleProvider for why that matters).
+    ExampleScreen(state, viewModel::onAction, onNavigateToDetail, onAbout = onAbout)
 }
 
 /** Scaffold owns safe insets. Children consume them before adding IME padding. */
@@ -53,7 +32,6 @@ fun ExampleScreen(
     state: ExampleState,
     onAction: (ExampleAction) -> Unit,
     onDetail: (String) -> Unit,
-    onLanguage: () -> Unit = {},
     onAbout: () -> Unit = {},
 ) {
     val listState = rememberLazyListState()
@@ -72,9 +50,6 @@ fun ExampleScreen(
                             style = MaterialTheme.typography.headlineSmall,
                             modifier = Modifier.weight(1f),
                         )
-                        TextButton(onClick = onLanguage, modifier = Modifier.testTag("example_language")) {
-                            Text(stringResource(Res.string.language))
-                        }
                         TextButton(onClick = onAbout, modifier = Modifier.testTag("example_about")) {
                             Text(stringResource(Res.string.about_title))
                         }

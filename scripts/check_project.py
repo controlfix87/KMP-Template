@@ -18,7 +18,7 @@ def files(root):
 PLATFORM_IMPORT = re.compile(
     r'\s*import\s+('
     r'android\.|java\.|javax\.'
-    r'|androidx\.(?!compose|lifecycle|navigation|savedstate)'
+    r'|androidx\.(?!compose|lifecycle|navigation|savedstate|datastore|room|sqlite)'
     r')'
 )
 DISPATCHERS_IMPORT = re.compile(r'\s*import\s+kotlinx\.coroutines\.Dispatchers$')

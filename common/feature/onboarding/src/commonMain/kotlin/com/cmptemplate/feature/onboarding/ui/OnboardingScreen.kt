@@ -25,6 +25,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,8 +33,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.cmptemplate.core.designsystem.ThemeManager
-import com.cmptemplate.core.designsystem.ThemeMode
+import com.cmptemplate.core.model.ThemeMode
 import com.cmptemplate.core.designsystem.components.AppIcons
 import com.cmptemplate.core.designsystem.components.AppMark
 import com.cmptemplate.core.designsystem.components.ContentMaxWidth
@@ -57,26 +57,14 @@ import com.cmptemplate.core.designsystem.generated.resources.onb_step_welcome
 import com.cmptemplate.core.designsystem.generated.resources.onb_welcome_body
 import com.cmptemplate.core.designsystem.generated.resources.onb_welcome_title
 import com.cmptemplate.core.designsystem.i18n.AppLocale
-import com.cmptemplate.core.designsystem.i18n.LocaleManager
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun OnboardingRoot(onDone: () -> Unit, viewModel: OnboardingViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val localeManager: LocaleManager = koinInject()
-    val themeManager: ThemeManager = koinInject()
-    val locale by localeManager.locale.collectAsStateWithLifecycle()
-    val theme by themeManager.mode.collectAsStateWithLifecycle()
-    OnboardingScreen(
-        state = state,
-        locale = locale,
-        theme = theme,
-        onLocale = localeManager::setLocale,
-        onTheme = themeManager::setMode,
-        onAction = { if (viewModel.onAction(it)) onDone() },
-    )
+    LaunchedEffect(state.finished) { if (state.finished) onDone() }
+    OnboardingScreen(state, viewModel::onAction)
 }
 
 /**
@@ -85,14 +73,7 @@ fun OnboardingRoot(onDone: () -> Unit, viewModel: OnboardingViewModel = koinView
  * to run setup again.
  */
 @Composable
-fun OnboardingScreen(
-    state: OnboardingState,
-    locale: AppLocale,
-    theme: ThemeMode,
-    onLocale: (AppLocale) -> Unit,
-    onTheme: (ThemeMode) -> Unit,
-    onAction: (OnboardingAction) -> Unit,
-) {
+fun OnboardingScreen(state: OnboardingState, onAction: (OnboardingAction) -> Unit) {
     val titles = OnboardingStep.entries.map {
         stringResource(
             when (it) {
@@ -119,7 +100,11 @@ fun OnboardingScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     when (step) {
-                        OnboardingStep.WELCOME -> WelcomeStep(locale, theme, onLocale, onTheme)
+                        OnboardingStep.WELCOME -> WelcomeStep(
+                            state.locale, state.theme,
+                            onLocale = { onAction(OnboardingAction.SetLocale(it)) },
+                            onTheme = { onAction(OnboardingAction.SetTheme(it)) },
+                        )
                         OnboardingStep.APP -> AppStep()
                         OnboardingStep.DONE -> DoneStep()
                     }

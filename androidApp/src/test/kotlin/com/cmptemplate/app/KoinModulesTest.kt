@@ -6,9 +6,9 @@ import com.cmptemplate.core.designsystem.i18n.LocaleManager
 import com.cmptemplate.core.designsystem.i18n.LocaleStore
 import com.cmptemplate.feature.example.domain.ExampleRepository
 import com.cmptemplate.feature.example.ui.ExampleViewModel
-import com.cmptemplate.core.designsystem.ThemeManager
-import com.cmptemplate.core.designsystem.settings.AppPreferences
-import com.cmptemplate.core.designsystem.settings.InMemoryPreferences
+import com.cmptemplate.core.datastore.InMemoryUserPreferences
+import com.cmptemplate.core.datastore.UserPreferencesRepository
+import com.cmptemplate.feature.about.ui.AboutViewModel
 import com.cmptemplate.core.model.AppInfo
 import com.cmptemplate.feature.about.report.Diagnostics
 import com.cmptemplate.feature.about.report.NoDiagnostics
@@ -52,18 +52,20 @@ class KoinModulesTest {
         } finally { app.close() }
     }
 
-    /** Host-only bindings replaced by fakes: Android Context-backed stores and the host's AppInfo. */
+    /** Host-only bindings replaced by fakes: Context-backed stores (DataStore, language) and AppInfo. */
     private val hostFakes = module {
-        single<AppPreferences> { InMemoryPreferences() }
+        single<UserPreferencesRepository> { InMemoryUserPreferences() }
+        single<LocaleStore> { object : LocaleStore { override fun read(): String? = null; override fun write(code: String) = Unit } }
         single<Diagnostics> { NoDiagnostics }
         single { AppInfo("com.cmptemplate.app", "CMPTemplate", "1", "1", "test", "android") }
         factory { SavedStateHandle() }
     }
 
-    @Test fun `production composition resolves about, report and theme`() {
+    @Test fun `production composition resolves app, about, report and onboarding view models`() {
         val app = koinApplication { modules(appModules + hostFakes) }
         try {
-            assertNotNull(app.koin.get<ThemeManager>())
+            assertNotNull(app.koin.get<AppViewModel>())
+            assertNotNull(app.koin.get<AboutViewModel>())
             assertNotNull(app.koin.get<ReportSender>())
             assertNotNull(app.koin.get<ReportViewModel> { parametersOf(ReportKind.BUG) })
             assertNotNull(app.koin.get<OnboardingViewModel>()) // [onboarding]

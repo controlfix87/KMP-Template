@@ -24,6 +24,7 @@ include(":common:core:model")         // pure Kotlin domain/DTO types, no Androi
 include(":common:core:common")        // AppResult/AppError, dispatchers, small shared utilities
 include(":common:core:designsystem")  // theme, typography, shared composables, all user-facing strings
 include(":common:core:network")       // Ktor HttpClient factory + base API plumbing
+include(":common:core:datastore")     // DataStore user settings (theme, onboarding done)
 
 // ---- features -------------------------------------------------------------
 // One feature module per screen/flow. Never depend on another :common:feature:*

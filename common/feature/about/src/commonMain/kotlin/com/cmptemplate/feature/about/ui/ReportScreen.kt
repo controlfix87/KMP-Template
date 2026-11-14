@@ -128,7 +128,7 @@ fun ReportScreen(
         Row(w, verticalAlignment = Alignment.CenterVertically) {
             Checkbox(state.includeLogs, { onAction(ReportAction.IncludeLogs(it)) }, Modifier.testTag("report_logs"))
             Column {
-                Text(stringResource(Res.string.report_logs))
+                Text(stringResource(Res.string.report_logs), color = MaterialTheme.colorScheme.onBackground)
                 Text(stringResource(Res.string.report_logs_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }

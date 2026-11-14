@@ -125,3 +125,17 @@ fixed in a473384 and re-recorded.
 Not executed: device instrumentation (`connectedDebugAndroidTest`), the iOS simulator app run,
 a Gradle build of a generated project (CI defines it), and a live report to reports.controlfix.net
 (the sender is covered by MockEngine tests only).
+
+## Follow-ups — 2026-11-14 (commits 6dee8c0..927c069)
+
+- Mac lane, one combined run at 6dee8c0: tests, lint, APKs, Android + desktop screenshot recording,
+  iOS simulator framework link — BUILD SUCCESSFUL. Screenshots reviewed (Hebrew now RTL, About
+  buttons in the brand colour).
+- Device: `connectedDebugAndroidTest` equivalent (`am instrument`) on Samsung SM-G950F (s8, API 28)
+  at 927c069 — **OK (3 tests)**. The first attempt failed 2/3 (setup ran before the DataStore read
+  drew a screen); fixed in 927c069.
+- Generated projects at 927c069 on the Mac: `SmokeNotes` (assembleDebug, desktop compile, about
+  desktop tests) and `BareNotes --without-onboarding` (assembleDebug, desktop compile, unit +
+  screenshot tests) both build.
+- Still not executed: the iOS app on a simulator, API 35/37 device lanes, a live report to
+  reports.controlfix.net.

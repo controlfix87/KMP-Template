@@ -16,6 +16,9 @@ shipped. What they learned is applied here; keep it when you replace the sample.
 | One shared reports service for every ControlFix app, ticket per app id, logs redacted on the device, logs only with a consent box (on by default), device details always, crash recorder installed first, crash cleared only after a successful send. | GameController | `feature:about` (`HttpReportSender`, `Redactor`, `CrashRecorder`) |
 | When the service is unreachable the user still needs a way out: e-mail to support. | owner (support@controlfix.net) | `SupportMail`, "Send by e-mail instead" |
 | An in-app light/dark choice means the status-bar icons must follow the app's theme, not the phone's, or they vanish. | LockdownControl | `SystemBarsEffect` in `CMPTemplateTheme` |
+| System back walks back through onboarding steps (`BackHandler`, Compose Multiplatform `ui-backhandler`). | LockdownControl | `OnboardingScreen` |
+| Device tests must wait for the first screen: the app draws nothing until the settings are read. | this template | `RestorationTest.skipOnboarding` |
+| Outlined buttons need the brand accent: Material 3's default reads as disabled on navy cards. | screenshot review | `brandOutlinedButtonColors()` |
 | ControlFix palette with a readable deep lime on light surfaces, Exo 2 only for headings/labels. | both | `Theme.kt` |
 | Onboarding: language and theme first, as big cards with flags/icons; a progress bar split per step, each with its title, upcoming steps visible, finished steps tappable; Skip on every step but the last; the step saved so a language change (Activity recreation) lands on the same step; "Run setup again" in settings. | LockdownControl, GameController | `feature:onboarding`, About |
 | About: mark + wordmark, version, "Made by ControlFix", website, report a problem, send a suggestion. | GameController | `AboutScreen` |
@@ -54,5 +57,3 @@ shipped. What they learned is applied here; keep it when you replace the sample.
 - **Android-only APIs** (accessibility services, overlays, Shizuku): keep them in `androidMain` or the
   Android app module behind an interface, as GameController's `core:platform` seams do. An app whose
   core feature cannot exist on iOS (both apps) drops the iOS target rather than shipping a shell.
-- **System back inside onboarding:** the screen has its own Back button; Compose Multiplatform's
-  back-handler API was not stable in this baseline. LockdownControl (Android-only) uses `BackHandler`.

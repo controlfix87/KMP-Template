@@ -11,6 +11,7 @@ import com.cmptemplate.core.datastore.UserPreferencesRepository
 import com.cmptemplate.core.model.ThemeMode
 import com.cmptemplate.core.model.UserSettings
 import com.cmptemplate.core.designsystem.i18n.AppLocale
+import com.cmptemplate.core.designsystem.i18n.AppLocaleProvider
 import com.cmptemplate.core.designsystem.i18n.LocaleStore
 import com.cmptemplate.core.model.AppInfo
 import com.cmptemplate.feature.about.ui.AboutScreen
@@ -50,7 +51,10 @@ class DesktopScreenshotTest {
         }
     }
 
-    @AfterTest fun stop() = stopKoin()
+    @AfterTest fun stop() {
+        stopKoin()
+        java.util.Locale.setDefault(java.util.Locale.ENGLISH)
+    }
 
     @Test fun home() = runDesktopComposeUiTest(width = 1024, height = 760) {
         setContent { App() }
@@ -78,7 +82,9 @@ class DesktopScreenshotTest {
     @Test fun onboarding() = runDesktopComposeUiTest(width = 1024, height = 760) {
         setContent {
             CMPTemplateTheme(darkTheme = false) {
-                OnboardingScreen(OnboardingState(OnboardingStep.WELCOME, AppLocale.French, ThemeMode.LIGHT)) {}
+                AppLocaleProvider(AppLocale.French) {
+                    OnboardingScreen(OnboardingState(OnboardingStep.WELCOME, AppLocale.French, ThemeMode.LIGHT)) {}
+                }
             }
         }
         waitForIdle()

@@ -8,5 +8,6 @@ plugins {
 kotlin {
     sourceSets.commonMain.dependencies {
         implementation(project(":common:core:datastore"))
+        implementation(libs.compose.ui.backhandler)
     }
 }

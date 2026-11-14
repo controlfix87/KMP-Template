@@ -18,6 +18,7 @@ import com.cmptemplate.core.datastore.UserPreferencesRepository
 import com.cmptemplate.core.model.ThemeMode
 import com.cmptemplate.core.model.UserSettings
 import com.cmptemplate.core.designsystem.i18n.AppLocale
+import com.cmptemplate.core.designsystem.i18n.AppLocaleProvider
 import com.cmptemplate.core.model.AppInfo
 import com.cmptemplate.feature.about.report.ReportKind
 import com.cmptemplate.feature.about.ui.AboutScreen
@@ -73,7 +74,11 @@ class ScreenshotTest {
         }
     }
 
-    @After fun stop() = stopKoin()
+    @After fun stop() {
+        stopKoin()
+        // AppLocaleProvider sets the process default; keep the next test on English.
+        java.util.Locale.setDefault(java.util.Locale.ENGLISH)
+    }
 
     private fun shot(name: String, dark: Boolean = true, content: @Composable () -> Unit) {
         compose.setContent { CMPTemplateTheme(darkTheme = dark) { content() } }
@@ -102,7 +107,10 @@ class ScreenshotTest {
     }
 
     @Test fun onboardingHebrewLight() = shot("onboarding_welcome_he_light", dark = false) {
-        OnboardingScreen(OnboardingState(OnboardingStep.WELCOME, AppLocale.Hebrew, ThemeMode.LIGHT)) {}
+        // Through AppLocaleProvider, as in the app: Hebrew strings AND right-to-left layout.
+        AppLocaleProvider(AppLocale.Hebrew) {
+            OnboardingScreen(OnboardingState(OnboardingStep.WELCOME, AppLocale.Hebrew, ThemeMode.LIGHT)) {}
+        }
     }
 
     @Test @Config(qualifiers = FOLD) fun onboardingFold() = shot("onboarding_welcome_fold") {

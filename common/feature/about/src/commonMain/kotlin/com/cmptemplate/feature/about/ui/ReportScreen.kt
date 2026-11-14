@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cmptemplate.core.designsystem.components.ContentMaxWidth
 import com.cmptemplate.core.designsystem.components.ScreenHeader
+import com.cmptemplate.core.designsystem.components.brandOutlinedButtonColors
 import com.cmptemplate.core.designsystem.generated.resources.Res
 import com.cmptemplate.core.designsystem.generated.resources.common_back
 import com.cmptemplate.core.designsystem.generated.resources.common_close
@@ -155,7 +156,7 @@ fun ReportScreen(
                 Text(stringResource(if (state.status == ReportStatus.Sending) Res.string.report_sending else Res.string.report_send))
             }
             if (failed != null) {
-                OutlinedButton(onClick = { noMailApp = !uriHandler.openSafely(mailUri()) }, Modifier.testTag("report_email")) {
+                OutlinedButton(onClick = { noMailApp = !uriHandler.openSafely(mailUri()) }, Modifier.testTag("report_email"), colors = brandOutlinedButtonColors()) {
                     Text(stringResource(Res.string.report_email))
                 }
             }

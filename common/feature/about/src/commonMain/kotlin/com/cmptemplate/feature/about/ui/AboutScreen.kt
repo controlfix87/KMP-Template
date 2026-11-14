@@ -39,6 +39,7 @@ import com.cmptemplate.core.designsystem.components.SectionCard
 import com.cmptemplate.core.designsystem.components.SectionLabel
 import com.cmptemplate.core.designsystem.components.ThemeChoices
 import com.cmptemplate.core.designsystem.components.Wordmark
+import com.cmptemplate.core.designsystem.components.brandOutlinedButtonColors
 import com.cmptemplate.core.designsystem.generated.resources.Res
 import com.cmptemplate.core.designsystem.generated.resources.about_body
 import com.cmptemplate.core.designsystem.generated.resources.about_feedback
@@ -135,11 +136,11 @@ fun AboutScreen(
         SectionCard {
             SectionLabel(stringResource(Res.string.about_feedback), AppIcons.Mail)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { onReport(ReportKind.BUG) }, Modifier.testTag("about_report")) {
+                OutlinedButton(onClick = { onReport(ReportKind.BUG) }, Modifier.testTag("about_report"), colors = brandOutlinedButtonColors()) {
                     Icon(AppIcons.Bug, contentDescription = null, Modifier.size(ButtonDefaults.IconSize))
                     Text(stringResource(Res.string.about_report), Modifier.padding(start = 8.dp))
                 }
-                OutlinedButton(onClick = { onReport(ReportKind.SUGGESTION) }, Modifier.testTag("about_suggest")) {
+                OutlinedButton(onClick = { onReport(ReportKind.SUGGESTION) }, Modifier.testTag("about_suggest"), colors = brandOutlinedButtonColors()) {
                     Icon(AppIcons.Lightbulb, contentDescription = null, Modifier.size(ButtonDefaults.IconSize))
                     Text(stringResource(Res.string.about_suggest), Modifier.padding(start = 8.dp))
                 }
@@ -162,7 +163,7 @@ fun AboutScreen(
             LanguageChoices(locale, onLocale)
             ThemeChoices(theme, onTheme)
             if (onRunSetupAgain != null) {
-                OutlinedButton(onClick = onRunSetupAgain, Modifier.testTag("about_run_setup")) {
+                OutlinedButton(onClick = onRunSetupAgain, Modifier.testTag("about_run_setup"), colors = brandOutlinedButtonColors()) {
                     Text(stringResource(Res.string.about_run_setup))
                 }
             }

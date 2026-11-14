@@ -28,6 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +41,7 @@ import com.cmptemplate.core.designsystem.components.AppMark
 import com.cmptemplate.core.designsystem.components.ContentMaxWidth
 import com.cmptemplate.core.designsystem.components.LanguageChoices
 import com.cmptemplate.core.designsystem.components.StepProgress
+import com.cmptemplate.core.designsystem.components.brandOutlinedButtonColors
 import com.cmptemplate.core.designsystem.components.ThemeChoices
 import com.cmptemplate.core.designsystem.generated.resources.Res
 import com.cmptemplate.core.designsystem.generated.resources.app_name
@@ -72,8 +75,11 @@ fun OnboardingRoot(onDone: () -> Unit, viewModel: OnboardingViewModel = koinView
  * theme first, as cards; Back, Skip (every step but the last) and Next; the last step says where
  * to run setup again.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun OnboardingScreen(state: OnboardingState, onAction: (OnboardingAction) -> Unit) {
+    // System back walks back through the steps (LockdownControl); on the first step it is not taken.
+    BackHandler(enabled = state.index > 0) { onAction(OnboardingAction.Back) }
     val titles = OnboardingStep.entries.map {
         stringResource(
             when (it) {
@@ -112,7 +118,7 @@ fun OnboardingScreen(state: OnboardingState, onAction: (OnboardingAction) -> Uni
             }
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 if (state.index > 0) {
-                    OutlinedButton(onClick = { onAction(OnboardingAction.Back) }, Modifier.testTag("onboarding_back")) {
+                    OutlinedButton(onClick = { onAction(OnboardingAction.Back) }, Modifier.testTag("onboarding_back"), colors = brandOutlinedButtonColors()) {
                         Text(stringResource(Res.string.onb_back))
                     }
                 }

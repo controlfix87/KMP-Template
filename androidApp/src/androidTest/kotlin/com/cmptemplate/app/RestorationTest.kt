@@ -14,11 +14,16 @@ import org.junit.runner.RunWith
 class RestorationTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
-    /** A fresh install opens on onboarding; these cases start from the home screen. */
+    /**
+     * A fresh install opens on onboarding; these cases start from the home screen. The first frame
+     * waits for the DataStore read, so wait for either screen before deciding.
+     */
     @org.junit.Before fun skipOnboarding() {
-        if (compose.onAllNodesWithTag("onboarding_skip").fetchSemanticsNodes().isNotEmpty()) {
+        fun shown(tag: String) = compose.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
+        compose.waitUntil(10_000) { shown("onboarding_skip") || shown("example_search") }
+        if (shown("onboarding_skip")) {
             compose.onNodeWithTag("onboarding_skip").performClick()
-            compose.waitForIdle()
+            compose.waitUntil(10_000) { shown("example_search") }
         }
     }
 
